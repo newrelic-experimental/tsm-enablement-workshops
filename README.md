@@ -4,7 +4,7 @@ A repository of codespace demos supporting TSM-led enablement.
 
 ## Demos Available
 
-- `terraform-demo`: Terraform hands on demo (to accompany our Observability-as-Code enablement)
+- [`terraform-demo`](./terraform-demo/readme.md): Terraform hands on demo (to accompany our Observability-as-Code enablement)
 
 
 ## Instructions

@@ -10,7 +10,7 @@ A repository of codespace demos supporting TSM-led enablement.
 ## Instructions
 To run a codespace on yoru account:
 
-- Go to the repo home (you;re on it) and CLick the greeen `<> Code` button.
+- Go to the [repo home](https://github.com/newrelic-experimental/tsm-enablement-workshops) and Click the greeen `<> Code` button.
 - Select the `Codespaces` tab
 - Click the three dots ellipsis `...` and select `New with options...`
 - From the "Dev container configuration" option choose the demo you want to run.

@@ -1,6 +1,6 @@
 
 # Terraform Codespace Demo
-> Follow the [instructions](./README.md) to start the demo Codespace and then follow along.
+> Follow the [instructions](../README.md) to start the demo Codespace and then follow along.
 
 
 For local development we recommend using [tfenv](https://github.com/tfutils/tfenv) to manage your Terraform versions. `tfenv` is already installed on this environment, we'll use it to install the latest stable version of terraform.

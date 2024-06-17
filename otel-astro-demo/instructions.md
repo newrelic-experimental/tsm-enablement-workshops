@@ -13,7 +13,7 @@ The demo uses feature flags to trigger perfromance degradation scenarios.  View 
 
 # Help
 If you need to run the installer again:
-> ./install_demo.sh deploy_demo
+> /install_demo.sh deploy_demo
 
 How to get frontend URL once demo is running:
 > echo "https://$CODESPACE_NAME-3000.app.github.dev/"

@@ -1,2 +1,6 @@
-Demo failures, update demo.flagd_failure.json and deploy it
-> kubectl create configmap newrelic-otel-flagd-config --from-file=demo.flagd.json=demo.flagd_failure.json -o yaml --dry-run=client | kubectl apply -f - && kubectl rollout restart deployment --selector=app.kubernetes.io/component=flagd
+# Feature flags
+The demo uses feature flags to trigger perfromance degradation scenarios. 
+
+To eneable.disable the flags edit the [demo.flagd_failure.json](demo.flagd_failure.json) file and restart the flagd service by running the following command in the terminal:
+
+> ./apply_flags.sh

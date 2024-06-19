@@ -12,6 +12,7 @@ create_cluster () {
    helm repo update >> /dev/null
    echo -e "\nRepos updated"
    echo -e "\nChecking minikube status"
+
    minikubestatus=$(docker container inspect minikube --format={{.State.Status}} 2>&1 | tr -d '\n')
    if test "$minikubestatus" == "exited"; then
       echo -e "\nMinikube current status is $minikubestatus"
@@ -21,13 +22,12 @@ create_cluster () {
       echo -e "\nMinikube current status is $minikubestatus"
       echo -e "\nMinikube already running, no action required"
    else
+      # pre build must have failed, create cluster now
       echo -e "\nMinikube not running"
       echo -e "\nCreating your cluster, please wait...\n"
-      minikube start --cpus 3 --memory 6144 --wait all
+      minikube start --cpus no-limit --memory no-limit --wait apiserver
       echo -e "\nCluster created!"
    fi
-   echo -e "\nBuilding image cache on background"
-   load_cache & 2>&1
    echo -e "\nCluster ready"
 }
 
@@ -113,16 +113,6 @@ wait_for_pods () {
    sleep 2
    clear
    echo -e "\n All pods ready!!!"
-}
-
-
-load_cache () {
-   
-    declare -a arr=($(docker images --format "{{.Repository}}:{{.Tag}}"))
-    for i in "${arr[@]}"
-    do
-        minikube image load $i --daemon
-    done
 }
 
 main "$@"

@@ -2,7 +2,7 @@
 
 main() {
     # If the argument is empty then run both functions else only run provided function as argument $1.
-    [ -z "$1" ] && { build_frontend; download_images; } || $1     
+    [ -z "$1" ] && { build_frontend; create_cluster; } || $1     
 }
 
 build_frontend () {
@@ -11,8 +11,11 @@ build_frontend () {
    sudo rm -rf /demo
 }
 
-download_images () {
-
+create_cluster () {
+   
+   echo -e "\nCreating your cluster, please wait...\n"
+   minikube start --cpus no-limit --memory no-limit --wait apiserver
+   echo -e "\nBuilding images cache"
    declare -a arr=(
 docker.io/nr-astro-otel-demo/local-frontend:latest
 busybox:latest
@@ -46,9 +49,12 @@ registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0
 
    for i in "${arr[@]}"
    do
-      docker pull $i 
+      echo -e "\Pulling image $i from remote registry"
+      minikube image load $i
+      echo -e "\Pushed image $i to minikube"
    done
 
+   minikube stop
 }
 
 main "$@"

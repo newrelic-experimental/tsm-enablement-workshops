@@ -6,28 +6,60 @@ main() {
 }
 
 create_cluster () {
-   echo -e "\nCreating your cluster, please wait..."
+   echo -e "\nUpdating helm repos"
    helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts >> /dev/null
+   helm repo add newrelic https://helm-charts.newrelic.com >> /dev/null
    helm repo update >> /dev/null
-   minikube start --cpus 3 --memory 6144 --wait all
-   minikube update-context
-   echo -e "\nCluster created!"
+   echo -e "\nRepos updated"
+   echo -e "\nChecking minikube status"
+   minikubestatus=$(docker container inspect minikube --format={{.State.Status}} 2>&1 | tr -d '\n')
+   if test "$minikubestatus" == "exited"; then
+      echo -e "\nMinikube current status is $minikubestatus"
+      echo -e "\nMinikube was not running, restarting it"
+      minikube start
+   elif test "$minikubestatus" == "running"; then
+      echo -e "\nMinikube current status is $minikubestatus"
+      echo -e "\nMinikube already running, no action required"
+   else
+      echo -e "\nMinikube not running"
+      echo -e "\nCreating your cluster, please wait...\n"
+      minikube start --cpus 3 --memory 6144 --wait all
+      echo -e "\nCluster created!"
+   fi
+   echo -e "\nBuilding image cache on background"
+   load_cache & 2>&1
+   echo -e "\nCluster ready"
 }
 
 deploy_demo () {
-   
+
+   while true; do
+       if [ -s /workspace/browseragent.js ]; then
+         # The file is not-empty.
+         sed -i '/<script type="text\/javascript">/g' /workspace/browseragent.js
+         sed -i '/<\/script>/g' /workspace/browseragent.js
+         echo -e "\nBrowser agent file has been updated"
+         kubectl create configmap newrelic-otel-browseragent --from-file=browseragent.js=browseragent.js -o yaml --dry-run=client | kubectl apply -f -
+         break
+      else
+         # The file is empty.
+         echo -e "\nPlease add New Relic browser script to browseragent.js"
+         sleep 5
+      fi
+   done
+
    while true; do
       echo -e "\nEnter your ingest license key: "
       read -t 60 licenseKey
       if [ -z $licenseKey ]; then
-         echo -e "License Key can't be empty!"
+         echo -e "\nLicense Key can't be empty"
          continue
       fi
       break
    done
 
    while true; do
-      echo -e "\nSpecigy your New Relic datacenter: [US/EU]"
+      echo -e "\nSpecify your New Relic datacenter: [US/EU]"
       read -t 60 datacenter
       if [ -z $datacenter ]; then
          echo -e "You need to choose a datacenter"
@@ -36,41 +68,61 @@ deploy_demo () {
       break
    done
 
+   echo -e "\nInstalling New Relic kubernetes integration\n"
+   helm upgrade --install newrelic-bundle newrelic/nri-bundle --set global.licenseKey=$licenseKey --namespace=default --values ./newrelic_values.yaml
+   echo -e "\nNew Relic kubernetes deployed"
 
-   echo -e "\nInstalling Otel application stack demo..."
+   echo -e "\nInstalling otel demo\n"
    kubectl create secret generic newrelic-key-secret --save-config --dry-run=client --from-literal=new_relic_license_key=$licenseKey -o yaml | kubectl apply -f - 2>&1
+   
+
    if [[  $(echo $datacenter | tr '[:upper:]' '[:lower:]') ==  "eu" ]]; then
-      helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./values.yaml --set opentelemetry-collector.config.exporters.otlp.endpoint="otlp.eu01.nr-data.net:4318" >> /dev/null
+      helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./otel_values.yaml --version 0.31.0 --set opentelemetry-collector.config.exporters.otlp.endpoint="otlp.eu01.nr-data.net:4318" >> /dev/null
    else
-      helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./values.yaml >> /dev/null
+      helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./otel_values.yaml --version 0.31.0 >> /dev/null
    fi
 
-   echo -e "Demo installed, waiting for all pods to be ready..."
+   echo -e "\nOTEL demo deployed"
+
+   echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
    sleep 3
-   run_with_dots kubectl wait --for=condition=Ready pods --all --timeout=10m 2>&1
-   echo -e "All pods ready"
+   wait_for_pods
    sleep 3
+   clear
+   echo -e "\nChecking frontend is ready to serve"
+   #Double check frontend is ready to serve, or send error to terminal
+   kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
    kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 3000:8080 >> /dev/null &
    gh codespace edit -c $CODESPACE_NAME -d 'newrelic-otel-astroshop'
    gh codespace ports visibility 3000:public -c $CODESPACE_NAME
    clear
-   echo -e "Access frontend via "https://$CODESPACE_NAME-3000.app.github.dev/""
+   echo -e "\nAccess frontend via "https://$CODESPACE_NAME-3000.app.github.dev/""
 }
 
-run_with_dots () {
-   "$@" &
 
-   while kill -0 $!; do
+wait_for_pods () {
+   declare -i numberpodsexpected=26
+   declare -i currentnumberpods=0
+   
+   while [[ $numberpodsexpected -ge $currentnumberpods ]];do
       clear
-      echo -e "Waiting for all pods to be ready, this can a few minutes, please wait...\n\n"
-      kubectl get pods > /dev/tty
-      sleep 3
+      kubectl get pods
+      currentnumberpods=$(kubectl get pods --field-selector=status.phase!=Succeeded,status.phase=Running --output name | wc -l | tr -d ' ')
+      sleep 5
    done
-   printf '\n' > /dev/tty
+   sleep 2
+   clear
+   echo -e "\n All pods ready!!!"
+}
 
+
+load_cache () {
+   
+    declare -a arr=($(docker images --format "{{.Repository}}:{{.Tag}}"))
+    for i in "${arr[@]}"
+    do
+        minikube image load $i 
+    done
 }
 
 main "$@"
-
-
-

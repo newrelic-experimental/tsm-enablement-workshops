@@ -233,6 +233,9 @@ components:
 
   frontend:
     enabled: true
+    imageOverride:
+      repository: "docker.io/nr-astro-otel-demo/local-frontend"
+      tag: "latest"
     useDefault:
       env: true
     service:
@@ -275,6 +278,11 @@ components:
       runAsUser: 1001  # nextjs
       runAsGroup: 1001
       runAsNonRoot: true
+    mountedConfigMaps:
+      - name: browseragent
+        mountPath: /app/browseragent.js
+        subPath: browseragent.js
+        existingConfigMap: 'newrelic-otel-browseragent'
 
   frontendProxy:
     enabled: true
@@ -282,9 +290,6 @@ components:
       env: true
     service:
       port: 8080
-    # imageOverride:
-    #   repository: "dpacheconr/frontendproxy-minimal"
-    #   tag: "latest"
     env:
       - name: ENVOY_PORT
         value: "8080"
@@ -563,7 +568,7 @@ opentelemetry-collector:
     kubernetesAttributes:
       enabled: true
     hostMetrics:
-      enabled: true
+      enabled: false
   resources:
     limits:
       memory: 200Mi

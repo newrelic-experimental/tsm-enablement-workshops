@@ -1,36 +1,37 @@
 {
-    "name": "nr-otel-astro",
-    "customizations": {
-      "vscode": {
-        "extensions": [],
-        "settings": {
-          "terminal.integrated.sendKeybindingsToShell": true
-        }
-      },
-      "codespaces": {
-        "openFiles": [
-          "instructions.md"
-        ]
+  "name": "nr-otel-astro",
+  "customizations": {
+    "vscode": {
+      "extensions": [],
+      "settings": {
+        "terminal.integrated.sendKeybindingsToShell": true
       }
     },
-    "forwardPorts": [3000],
-    "portsAttributes": {
-      "3000": {
-        "label": "FRONTEND",
-        "onAutoForward": "openBrowser"
-      }
-    },
-    "hostRequirements": {"cpus": 3,"memory": "6gb"},
-    "containerUser": "demouser",
-    "postAttachCommand": ["bash", "-i", "-c", "/install_demo.sh"],
-    "build": { "dockerfile": "Dockerfile" },
-    "workspaceMount": "source=${localWorkspaceFolder}/otel-astro-demo,target=/workspace,type=bind",
-    "workspaceFolder": "/workspace",
-    "features": {
-      "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-      "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
-      "ghcr.io/guiyomh/features/vim:0": {},
-      "ghcr.io/devcontainers/features/github-cli:1": {}
+    "codespaces": {
+      "openFiles": [
+        "instructions.md"
+      ]
     }
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "FRONTEND",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "hostRequirements": {"cpus": 3,"memory": "6gb"},
+  "containerUser": "demouser",
+  "onCreateCommand": ["bash", "-i", "-c", "/configure_environment.sh"],
+  "postAttachCommand": ["bash", "-i", "-c", "/install_demo.sh"],
+  "build": { "dockerfile": "Dockerfile" },
+  "workspaceMount": "source=${localWorkspaceFolder}/otel-astro-demo,target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
+    "ghcr.io/guiyomh/features/vim:0": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   }
-  
+}
+

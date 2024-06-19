@@ -6,6 +6,7 @@ main() {
 }
 
 build_frontend () {
+   echo "\n Building frontend image, this may take while"
    cd /demo/scripts/ && docker compose build
    sudo rm -rf /demo
 }
@@ -50,7 +51,4 @@ registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0
 
 }
 
-
 main "$@"
-
-

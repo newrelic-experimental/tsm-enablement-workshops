@@ -69,7 +69,7 @@ deploy_demo () {
    done
 
    echo -e "\nInstalling New Relic kubernetes integration\n"
-   helm upgrade --install newrelic-bundle newrelic/nri-bundle --set global.licenseKey=$licenseKey --namespace=default --values ./newrelic_values.yaml
+   helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=default --values ./newrelic_values.yaml
    echo -e "\nNew Relic kubernetes deployed"
 
    echo -e "\nInstalling otel demo\n"

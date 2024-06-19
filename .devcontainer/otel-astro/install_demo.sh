@@ -121,7 +121,7 @@ load_cache () {
     declare -a arr=($(docker images --format "{{.Repository}}:{{.Tag}}"))
     for i in "${arr[@]}"
     do
-        minikube image load $i 
+        minikube image load $i --daemon
     done
 }
 

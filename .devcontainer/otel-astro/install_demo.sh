@@ -44,7 +44,7 @@ deploy_demo () {
       else
          # The file is empty.
          echo -e "\nPlease add New Relic browser script to browseragent.js"
-         sleep 5
+         sleep 15
       fi
    done
 
@@ -89,7 +89,7 @@ deploy_demo () {
    wait_for_pods
    sleep 3
    clear
-   echo -e "\nChecking frontend is ready to serve"
+   echo -e "\nChecking frontend is ready to serve\n"
    #Double check frontend is ready to serve, or send error to terminal
    kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
    kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 3000:8080 >> /dev/null &

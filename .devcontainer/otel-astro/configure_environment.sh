@@ -49,9 +49,9 @@ registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0
 
    for i in "${arr[@]}"
    do
-      echo -e "\nPulling image $i from remote registry"
+      echo -e "\nPulling image $i from remote registry\n"
       minikube image load $i
-      echo -e "\nPushed image $i to minikube"
+      echo -e "\nPushed image $i to minikube\n"
    done
 
    minikube stop

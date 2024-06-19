@@ -1,0 +1,9 @@
+services:
+  frontend:
+    image: nr-astro-otel-demo/local-frontend:latest
+    container_name: frontend
+    build:
+      context: ./
+      dockerfile: ./src/frontend/Dockerfile
+      cache_from:
+        - ghcr.io/open-telemetry/demo:latest-frontend

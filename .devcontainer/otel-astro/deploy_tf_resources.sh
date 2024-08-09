@@ -2,10 +2,10 @@
 
 main() {
     # If the argument is empty then run both functions else only run provided function as argument $1.
-    [ -z "$1" ] && { deploy_tf; } || $1     
+    [ -z "$1" ] && { deploy; destroy; } || $1     
 }
 
-deploy_tf () {
+deploy () {
       while true; do
       echo -e "\nEnter your user license key: "
       read -t 60 licenseKey
@@ -41,9 +41,18 @@ deploy_tf () {
       export NEW_RELIC_API_KEY=$licenseKey
       export NEW_RELIC_ACCOUNT_ID=$accountid
       export NEW_RELIC_REGION=$datacenter
+      cd /terraform_resources
       terraform init
       terraform apply -auto-approve
       echo -e "\nTerraform resources deployed"
 
 }
+
+destroy () {
+      echo -e "\nDestroying Terraform resources"
+      cd /terraform_resources
+      terraform destroy -auto-approve
+      echo -e "\nTerraform resources destroyed"
+}
+
 main "$@"

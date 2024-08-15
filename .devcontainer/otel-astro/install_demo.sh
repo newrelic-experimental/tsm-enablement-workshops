@@ -34,6 +34,16 @@ create_cluster () {
 deploy_demo () {
 
    while true; do
+      echo -e "\Use New Relic k8s integration or OTEL aka NRDOT? [newrelic/otel]"
+      read -t 60 k8smonitoringtype
+      if [ -z $licenseKey ]; then
+         echo -e "\nK8s monitoring type can't be empty"
+         continue
+      fi
+      break
+   done
+
+   while true; do
        if [ -s /workspace/browseragent.js ]; then
          # The file is not-empty.
          sed -i '/<script type="text\/javascript">/g' /workspace/browseragent.js
@@ -68,10 +78,15 @@ deploy_demo () {
       break
    done
 
-   echo -e "\nInstalling New Relic kubernetes integration\n"
-   # helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=default --values ./newrelic_values.yaml
-   helm upgrade install nr-k8s-otel-collector newrelic/nr-k8s-otel-collector --version 0.7.1 --namespace=default--install --set licenseKey=$licenseKey --values ./nrdot.yaml
-   echo -e "\nNew Relic kubernetes deployed"
+   if [[  $(echo $datacenter | tr '[:upper:]' '[:lower:]') ==  "eu" ]]; then
+      echo -e "\nInstalling New Relic OTEL kubernetes integration\n"
+      helm upgrade install nr-k8s-otel-collector newrelic/nr-k8s-otel-collector --version 0.7.1 --namespace=default--install --set licenseKey=$licenseKey --values ./nrdot.yaml
+      echo -e "\nNew Relic OTEL kubernetes deployed"
+   else
+      echo -e "\nInstalling New Relic kubernetes integration\n"
+      helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=default --values ./newrelic_values.yaml
+      echo -e "\nNew Relic kubernetes deployed"
+   fi
 
    echo -e "\nInstalling otel demo\n"
    kubectl create secret generic newrelic-key-secret --save-config --dry-run=client --from-literal=new_relic_license_key=$licenseKey -o yaml | kubectl apply -f - 2>&1

@@ -34,9 +34,9 @@ create_cluster () {
 deploy_demo () {
 
    while true; do
-      echo -e "\Use New Relic k8s integration or OTEL aka NRDOT? [newrelic/otel]"
+      echo -e "\nUse New Relic k8s integration or OTEL aka NRDOT? [nr/otel]"
       read -t 60 k8smonitoringtype
-      if [ -z $licenseKey ]; then
+      if [ -z $k8smonitoringtype ]; then
          echo -e "\nK8s monitoring type can't be empty"
          continue
       fi
@@ -68,19 +68,20 @@ deploy_demo () {
       break
    done
 
-   while true; do
-      echo -e "\nSpecify your New Relic datacenter: [US/EU]"
-      read -t 60 datacenter
-      if [ -z $datacenter ]; then
-         echo -e "You need to choose a datacenter"
-         continue
-      fi
-      break
-   done
 
-   if [[  $(echo $datacenter | tr '[:upper:]' '[:lower:]') ==  "eu" ]]; then
+   if  [[ $licenseKey == eu* ]]  then 
+      echo -e "\nLicense key is for EU datacenter"
+      echo -e "\nWill deploy to EU datacenter"
+      datacenter="eu"
+   else
+      echo -e "\nLicense key is for US datacenter"
+      echo -e "\nWill deploy to US datacenter"
+      datacenter="us"
+   fi
+
+   if [[  $(echo $k8smonitoringtype | tr '[:upper:]' '[:lower:]') ==  "otel" ]]; then
       echo -e "\nInstalling New Relic OTEL kubernetes integration\n"
-      helm upgrade install nr-k8s-otel-collector newrelic/nr-k8s-otel-collector --version 0.7.1 --namespace=default--install --set licenseKey=$licenseKey --values ./nrdot.yaml
+      helm upgrade --install nr-k8s-otel-collector newrelic/nr-k8s-otel-collector --version 0.7.1 --namespace=default --set licenseKey=$licenseKey --values ./nrdot.yaml
       echo -e "\nNew Relic OTEL kubernetes deployed"
    else
       echo -e "\nInstalling New Relic kubernetes integration\n"
@@ -117,13 +118,19 @@ deploy_demo () {
 
 
 wait_for_pods () {
-   declare -i numberpodsexpected=26
+   if [[  $(echo $k8smonitoringtype | tr '[:upper:]' '[:lower:]') ==  "otel" ]]; then
+      declare -i numberpodsexpected=23
+   else
+      declare -i numberpodsexpected=26
+   fi
    declare -i currentnumberpods=0
    
    while [[ $numberpodsexpected -ge $currentnumberpods ]];do
       clear
       kubectl get pods
+      echo -e "\nNumber of expected pods in running state needs to exceed: $numberpodsexpected"
       currentnumberpods=$(kubectl get pods --field-selector=status.phase!=Succeeded,status.phase=Running --output name | wc -l | tr -d ' ')
+      echo -e "\nCurrent number of pods in running state: $currentnumberpods"
       sleep 5
    done
    sleep 2

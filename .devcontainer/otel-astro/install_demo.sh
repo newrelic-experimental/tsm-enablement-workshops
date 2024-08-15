@@ -119,9 +119,9 @@ deploy_demo () {
 
 wait_for_pods () {
    if [[  $(echo $k8smonitoringtype | tr '[:upper:]' '[:lower:]') ==  "otel" ]]; then
-      declare -i numberpodsexpected=23
+      declare -i numberpodsexpected=22
    else
-      declare -i numberpodsexpected=26
+      declare -i numberpodsexpected=25
    fi
    declare -i currentnumberpods=0
    

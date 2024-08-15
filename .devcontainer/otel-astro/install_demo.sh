@@ -69,7 +69,8 @@ deploy_demo () {
    done
 
    echo -e "\nInstalling New Relic kubernetes integration\n"
-   helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=default --values ./newrelic_values.yaml
+   # helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=default --values ./newrelic_values.yaml
+   helm upgrade install nr-k8s-otel-collector newrelic/nr-k8s-otel-collector --version 0.7.1 --namespace=default--install --set licenseKey=$licenseKey --values ./nrdot.yaml
    echo -e "\nNew Relic kubernetes deployed"
 
    echo -e "\nInstalling otel demo\n"

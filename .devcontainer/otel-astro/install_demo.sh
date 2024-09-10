@@ -3,7 +3,16 @@
 main() {
 
    if [ -f "firstrun.txt" ]; then
-       echo "Install script already run. Delete /firstrun.txt to re-run."
+       echo "Install script already run. Delete /firstrun.txt to re-run. Restarting minkube..."
+       minikube start 
+       echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
+       sleep 3
+       wait_for_pods
+       echo -e "\nChecking frontend is ready to serve\n"
+      #Double check frontend is ready to serve, or send error to terminal
+      kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
+      kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 3000:8080 >> /dev/null &
+   sleep 3
     else
       # If the argument is empty then run both functions else only run provided function as argument $1.
       touch firstrun.txt

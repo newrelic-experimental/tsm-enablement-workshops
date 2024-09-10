@@ -358,7 +358,7 @@ components:
       - name: LOCUST_WEB_PORT
         value: "8089"
       - name: LOCUST_USERS
-        value: "1"
+        value: "2"
       - name: LOCUST_SPAWN_RATE
         value: "1"
       - name: LOCUST_HOST

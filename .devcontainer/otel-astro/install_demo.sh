@@ -3,7 +3,8 @@
 main() {
 
    if [ -f "firstrun.txt" ]; then
-       echo "Install script already run. Delete /firstrun.txt to re-run. Restarting minkube..."
+       echo "Install script already run. Delete /firstrun.txt to re-run." 
+       ehoc "Restarting minkube..."
        minikube start 
        echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
        sleep 3

@@ -12,6 +12,7 @@ main() {
       #Double check frontend is ready to serve, or send error to terminal
       kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
       kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 3000:8080 >> /dev/null &
+      echo -e "\nAccess frontend via "https://$CODESPACE_NAME-3000.app.github.dev/""
    sleep 3
     else
       # If the argument is empty then run both functions else only run provided function as argument $1.

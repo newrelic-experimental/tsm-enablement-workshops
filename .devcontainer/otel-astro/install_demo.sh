@@ -6,6 +6,7 @@ main() {
        echo "Install script already run. Delete /firstrun.txt to re-run."
     else
       # If the argument is empty then run both functions else only run provided function as argument $1.
+      touch firstrun.txt
       [ -z "$1" ] && { create_cluster; deploy_demo; } || $1     
     fi
   

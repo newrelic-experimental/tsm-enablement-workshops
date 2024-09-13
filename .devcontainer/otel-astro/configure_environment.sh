@@ -42,6 +42,7 @@ newrelic/k8s-metadata-injection:1.27.3
 newrelic/newrelic-fluentbit-output:2.0.0
 newrelic/nri-kube-events:2.9.9
 newrelic/nri-kubernetes:3.28.8
+newrelic/otel-demo:1.11.0-recommendationservice
 otel/opentelemetry-collector-contrib:0.102.1
 redis:7.2-alpine
 registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0

@@ -99,7 +99,7 @@ deploy_demo () {
 
    if [[  $(echo $k8smonitoringtype | tr '[:upper:]' '[:lower:]') ==  "otel" ]]; then
       echo -e "\nInstalling New Relic OTEL kubernetes integration\n"
-      helm upgrade --install nr-k8s-otel-collector newrelic/nr-k8s-otel-collector --version 0.7.1 --namespace=default --set licenseKey=$licenseKey --values ./nrdot.yaml
+      helm upgrade --install nr-k8s-otel-collector newrelic/nr-k8s-otel-collector --version 0.7.5 --namespace=default --set licenseKey=$licenseKey --values ./nrdot.yaml
       echo -e "\nNew Relic OTEL kubernetes deployed"
    else
       echo -e "\nInstalling New Relic kubernetes integration\n"

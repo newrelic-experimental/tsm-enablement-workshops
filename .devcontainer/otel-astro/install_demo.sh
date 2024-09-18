@@ -4,7 +4,7 @@ main() {
 
    if [ -f "firstrun.txt" ]; then
        echo "Install script already run. Delete /firstrun.txt to re-run." 
-       ehoc "Restarting minkube..."
+       ehoc "Restarting minikube..."
        minikube start 
        echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
        sleep 3
@@ -62,10 +62,16 @@ deploy_demo () {
    done
 
    while true; do
-       if [ -s /workspace/browseragent.js ]; then
+       BROWSER_FILE="browseragent.js"
+       if [ -d "/workspace" ]; then
+         BROWSER_FILE="/workspace/browseragent.js"
+       fi
+       
+       if [ -s "$BROWSER_FILE" ]; then
          # The file is not-empty.
-         sed -i '/<script type="text\/javascript">/g' /workspace/browseragent.js
-         sed -i '/<\/script>/g' /workspace/browseragent.js
+         echo -e "\nRemoving script tags from browser file $BROWSER_FILE"
+         sed -i '/<script type="text\/javascript">/g' $BROWSER_FILE
+         sed -i '/<\/script>/g' $BROWSER_FILE
          echo -e "\nBrowser agent file has been updated"
          kubectl create configmap newrelic-otel-browseragent --from-file=browseragent.js=browseragent.js -o yaml --dry-run=client | kubectl apply -f -
          break

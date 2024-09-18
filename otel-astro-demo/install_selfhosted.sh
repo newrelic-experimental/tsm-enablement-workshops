@@ -16,7 +16,7 @@ cp -R "$BUILD_FOLDER/demo/opentelemetry-demo-1.10.0/src/frontend" "$BUILD_FOLDER
 cp -R "$BUILD_FOLDER/demo/opentelemetry-demo-1.10.0/pb" "$BUILD_FOLDER/demo/"
 
 cp ../.devcontainer/otel-astro/frontend_image/docker-compose.yaml "$BUILD_FOLDER/demo"
-cp ../.devcontainer/otel-astro/frontend_image/_document.tsx "$BUILD_FOLDER/src/frontend/pages/"
+cp ../.devcontainer/otel-astro/frontend_image/_document.tsx "$BUILD_FOLDER/demo/src/frontend/pages/"
 
 rm $BUILD_FOLDER/demo/opentelemetry-demo-1.10.0 -rf
 

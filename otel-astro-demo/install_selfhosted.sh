@@ -21,7 +21,7 @@ docker compose -f $BUILD_FOLDER/demo/docker-compose.yaml build
 rm -rf $BUILD_FOLDER
 
 #add image to minikube  cache
-echo -e "\n\n Loading image into minikube..."
+echo -e "\n\n Loading image into minikube... this may take a few minutes..."
 minikube image load docker.io/nr-astro-otel-demo/local-frontend:latest
 
 echo -e "\nFrontend image is built, starting demo install script."

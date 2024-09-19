@@ -100,7 +100,7 @@ deploy_demo () {
    done
 
 
-   if  [[ $licenseKey == eu* ]]  then 
+   if  [[ $licenseKey == eu* ]];  then 
       echo -e "\nLicense key is for EU datacenter"
       echo -e "\nWill deploy to EU datacenter"
       datacenter="eu"

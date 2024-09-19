@@ -59,11 +59,11 @@ echo -e "\n\n User data installation steps complete."
 Once the environment is in place clone the repository, update browseragent.js and run the installer:
 ```
 git clone https://github.com/newrelic-experimental/tsm-enablement-workshops.git
-cd tsm-enablement-workshops/otel-astro-demo
 ```
 
 Update browseragent.js with the code snippet from the Application Settings of Browser UI in New Relic:
 ```
+cd tsm-enablement-workshops/otel-astro-demo
 vi browseragent.js
 
 // Key sequence to edit and save in vi: 

@@ -78,3 +78,7 @@ Then run the installer. You will need your ingest license key:
 ```
 ./install_selfhosted.sh
 ```
+
+
+# Feature flags
+The demo uses feature flags to trigger perfromance degradation scenarios.  View the [feature flag instructions](flagd_intructions.md) to learn how to apply them.

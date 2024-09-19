@@ -1,4 +1,4 @@
-# OTel demo environment startup
+# OTel Codespace demo environment startup
 
 Your environment is configured automatically at startup. This may take a few moments for the terminal to appear...
 
@@ -7,7 +7,7 @@ Please refer to the terminal instructions to provide necessary configuration for
 ----
 
 # Feature flags
-The demo uses feature flags to trigger perfromance degradation scenarios.  View the [featuer flag instructions](flagd_intructions.md) to learn how to apply them.
+The demo uses feature flags to trigger perfromance degradation scenarios.  View the [feature flag instructions](flagd_intructions.md) to learn how to apply them.
 
 ----
 

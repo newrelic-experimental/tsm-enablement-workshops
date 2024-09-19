@@ -4,7 +4,7 @@ Use these instructions to run the demo in your own environment rather than in a 
 
 ## Environment Setup (Ubuntu)
 
-The following is a useful user data script for an ec2 Ubunutu launch template. You could also run these (as root) in your V directly.
+The following is a useful user data script for an ec2 Ubunutu launch template. You could also run these (as root) in your VM directly.
 
 ```
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1

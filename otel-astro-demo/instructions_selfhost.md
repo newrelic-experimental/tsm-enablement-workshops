@@ -1,5 +1,5 @@
 # Self Host
-Use these instructions to run the demo in your own environment rather than in a codesapce. This allows you to run for longer amongst other benefits. The demo requires Docker, minikube, kubectl and helm and the guidance is based on an Ubuntu AWS EC2 instance. You may need to adjust the installation of the dependencies if using a different operating system
+Use these instructions to run the demo in your own environment rather than in a codesapce. This allows you to run for longer amongst other benefits. The demo requires Docker, minikube, kubectl and helm and the guidance is based on an Ubuntu AWS EC2 t2.xlarge instance. You may need to adjust the installation of the dependencies if using a different operating system
 .
 
 ## Environment Setup (Ubuntu)

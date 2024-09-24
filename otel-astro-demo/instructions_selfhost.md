@@ -1,16 +1,16 @@
 # Self Host
-Use these instructions to run the demo in your own environment rather than in a codesapce. This allows you to run for longer amongst other benefits. The demo requires Docker, minikube, kubectl and helm and the guidance is based on an Ubuntu AWS EC2 t2.xlarge instance. You may need to adjust the installation of the dependencies if using a different operating system
-.
+Use these instructions to run the demo in your own environment rather than in a codesapce. This allows you to run for longer amongst other benefits. The demo requires Docker, minikube, kubectl and helm and the guidance is based on an Ubuntu  AWS EC2 t2.xlarge instance (or Azure Standard D4s 4CPU VM). You may need to adjust the installation of the dependencies if using a different operating system.
 
-## Environment Setup (Ubuntu)
+## Environment Setup (Ubuntu 24.x LTS)
 
-The following is a useful user data script for an ec2 Ubuntu launch template. You could also run these (as root) in your VM directly. This expectsthe user to be called "ubuntu", adjust accordingly for your own environment.
+The following script is a complete bootstrapping user data script for an AWS ec2 Ubuntu launch template. You can also run these commands (as root user) in your VM directly. This expects the non-root user to be called "ubuntu", adjust accordingly for your own environment. 
 
 ```
 # Uncomment the line below if running in ec2 user data. This pipes the user data script to the file /var/log/user-data.log
 # exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
-NON_ROOT_USER="ubuntu"
+NON_ROOT_USER="ubuntu" # Change this to your standard non-root VM user
+
 
 # ----> Install docker (https://docs.docker.com/engine/install/ubuntu/)
 
@@ -57,7 +57,7 @@ chmod 700 get_helm.sh
 echo -e "\n\n User data installation steps complete."
 ```
 
-Check you can run `docker ps` and `kubectl get namespaces`. You may need to log out and back in again.
+Check you can run as your non-root user: `docker ps` and `kubectl get namespaces`. You may need to log out and back in again.
 
 ## Installing the demo
 

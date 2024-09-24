@@ -9,7 +9,7 @@ The following script is a complete bootstrapping user data script for an AWS ec2
 # Uncomment the line below if running in ec2 user data. This pipes the user data script to the file /var/log/user-data.log
 # exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
-NON_ROOT_USER="ubuntu" # Change this to your standard non-root VM user
+NON_ROOT_USER="ubuntu"   #Change this as necessary to your standard non-root VM user
 
 
 # ----> Install docker (https://docs.docker.com/engine/install/ubuntu/)

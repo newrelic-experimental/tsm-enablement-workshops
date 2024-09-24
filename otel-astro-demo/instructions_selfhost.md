@@ -4,17 +4,19 @@ Use these instructions to run the demo in your own environment rather than in a 
 
 ## Environment Setup (Ubuntu)
 
-The following is a useful user data script for an ec2 Ubunutu launch template. You could also run these (as root) in your VM directly.
+The following is a useful user data script for an ec2 Ubuntu launch template. You could also run these (as root) in your VM directly. This expectsthe user to be called "ubuntu", adjust accordingly for your own environment.
 
 ```
 # Uncomment the line below if running in ec2 user data. This pipes the user data script to the file /var/log/user-data.log
 # exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
+NON_ROOT_USER="ubuntu"
+
 # ----> Install docker (https://docs.docker.com/engine/install/ubuntu/)
 
 # Setup permissions for docker to be accessed by "ubuntu" user
 sudo groupadd docker
-sudo usermod -aG docker ubuntu
+sudo usermod -aG docker $NON_ROOT_USER
 
 # Add Docker's official GPG key:
 sudo apt-get update
@@ -37,7 +39,7 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 # ----> Install minikube (https://minikube.sigs.k8s.io/docs/start/)
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
-sudo -u ubuntu bash -c  "minikube start"
+sudo -u $NON_ROOT_USER bash -c  "minikube start"
 
 
 
@@ -54,6 +56,8 @@ chmod 700 get_helm.sh
 
 echo -e "\n\n User data installation steps complete."
 ```
+
+Check you can run `docker ps` and `kubectl get namespaces`. You may need to log out and back in again.
 
 ## Installing the demo
 

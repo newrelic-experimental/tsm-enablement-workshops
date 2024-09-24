@@ -7,7 +7,8 @@ Use these instructions to run the demo in your own environment rather than in a 
 The following is a useful user data script for an ec2 Ubunutu launch template. You could also run these (as root) in your VM directly.
 
 ```
-exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+# Uncomment the line below if running in ec2 user data. This pipes the user data script to the file /var/log/user-data.log
+# exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 # ----> Install docker (https://docs.docker.com/engine/install/ubuntu/)
 

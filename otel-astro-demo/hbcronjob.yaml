@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: nrheartbeat
 spec:
-  schedule: "* * * * *"
+  schedule: "*/15 * * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:

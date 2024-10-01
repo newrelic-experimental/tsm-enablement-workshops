@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nrheartbeat
+spec:
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: nrheartbeat
+            image: curlimages/curl
+            imagePullPolicy: IfNotPresent
+            env:
+              # Define the environment variable
+              - name: hbuid # Notice that the case is different here
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat      # The ConfigMap this value comes from.
+                    key: hbuid # The key to fetch.          
+              - name: hbhostname # Notice that the case is different here
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat      # The ConfigMap this value comes from.
+                    key: hbhostname # The key to fetch.   
+              - name: hbhostversion # Notice that the case is different here
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat      # The ConfigMap this value comes from.
+                    key: hbhostversion # The key to fetch.   
+            command:
+            - /bin/sh
+            - -c
+            - curl -v -k "https://f6zxc2425pz4vbuidpknebsz7q0viifd.lambda-url.eu-west-2.on.aws/?identifier=$hbuid&message=otelinboxheartbeat&hbhostversion=$hbhostversion&hbhostname=$hbhostname"
+          restartPolicy: OnFailure

@@ -25,6 +25,10 @@ main() {
     else
       # If the argument is empty then run both functions else only run provided function as argument $1.
       touch firstrun.txt
+      HBHOSTVERSION=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
+      HBHOSTNAME=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
+      kubectl create configmap nrheartbeat --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$HBHOSTVERSION --from-literal=hbhostname=$HBHOSTNAME
+      kubectl apply -f ./hbcronjob.yaml
       [ -z "$1" ] && { create_cluster; deploy_demo; } || $1     
     fi
   

@@ -1,19 +1,6 @@
 #!/usr/bin/env bash
 
 main() {
-   # Deploy heartbeat mechanism
-   if  [[ $selfhosted = true ]];  then 
-      hbselfhosted="true"
-   else
-      hbselfhosted="false"
-   fi
-
-   hbhostversion=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
-   hbhostname=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
-   # Applies if does not exist or warns if exists, this is intentional to avoid uid being replaced on each time it runs
-   kubectl create configmap nrheartbeat --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted 
-   kubectl apply -f ./hbcronjob.yaml
-
    # Check if the script has been run before
    if [ -f "firstrun.txt" ]; then
        echo -e "\n\nInstall script already run. Delete /firstrun.txt to re-run installation." 
@@ -23,7 +10,7 @@ main() {
        sleep 3
        wait_for_pods
        echo -e "\nChecking frontend is ready to serve\n"
-      #Double check frontend is ready to serve, or send error to terminal
+      # Double check frontend is ready to serve, or send error to terminal
       kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
 
       if [ -d "/workspace" ]; then
@@ -150,8 +137,22 @@ deploy_demo () {
    sleep 3
    clear
    echo -e "\nChecking frontend is ready to serve\n"
-   #Double check frontend is ready to serve, or send error to terminal
+   # Double check frontend is ready to serve, or send error to terminal
    kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
+
+   # Deploy heartbeat mechanism
+   if  [[ $selfhosted = true ]];  then 
+      hbselfhosted="true"
+   else
+      hbselfhosted="false"
+   fi
+
+   hbstarttime=$(date +%s)
+   hbhostversion=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
+   hbhostname=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
+   # Applies if does not exist or warns if exists, this is intentional to avoid uid being replaced on each time it runs
+   kubectl create configmap nrheartbeat --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
+   kubectl apply -f ./hbcronjob.yaml
 
    if [ -d "/workspace" ]; then
       kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 3000:8080 >> /dev/null &

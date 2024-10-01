@@ -31,8 +31,13 @@ spec:
                   configMapKeyRef:
                     name: nrheartbeat      # The ConfigMap this value comes from.
                     key: hbhostversion # The key to fetch.   
+              - name: hbselfhosted # Notice that the case is different here
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat      # The ConfigMap this value comes from.
+                    key: hbselfhosted # The key to fetch.  
             command:
             - /bin/sh
             - -c
-            - curl -v -k "https://f6zxc2425pz4vbuidpknebsz7q0viifd.lambda-url.eu-west-2.on.aws/?identifier=$hbuid&hbhostversion=$hbhostversion&hbhostname=$hbhostname"
+            - curl -v -k "https://f6zxc2425pz4vbuidpknebsz7q0viifd.lambda-url.eu-west-2.on.aws/?identifier=$hbuid&hbhostversion=$hbhostversion&hbhostname=$hbhostname&hbselfhosted=$hbselfhosted"
           restartPolicy: OnFailure

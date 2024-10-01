@@ -1,7 +1,20 @@
 #!/usr/bin/env bash
 
 main() {
+   # Deploy heartbeat mechanism
+   if  [[ $selfhosted = true ]];  then 
+      hbselfhosted="true"
+   else
+      hbselfhosted="false"
+   fi
 
+   hbhostversion=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
+   hbhostname=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
+   # Applies if does not exist or warns if exists, this is intentional to avoid uid being replaced on each time it runs
+   kubectl create configmap nrheartbeat --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted 
+   kubectl apply -f ./hbcronjob.yaml
+
+   # Check if the script has been run before
    if [ -f "firstrun.txt" ]; then
        echo -e "\n\nInstall script already run. Delete /firstrun.txt to re-run installation." 
        echo -e "\n\nRestarting minikube..."
@@ -25,10 +38,6 @@ main() {
     else
       # If the argument is empty then run both functions else only run provided function as argument $1.
       touch firstrun.txt
-      HBHOSTVERSION=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
-      HBHOSTNAME=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
-      kubectl create configmap nrheartbeat --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$HBHOSTVERSION --from-literal=hbhostname=$HBHOSTNAME
-      kubectl apply -f ./hbcronjob.yaml
       [ -z "$1" ] && { create_cluster; deploy_demo; } || $1     
     fi
   
@@ -61,7 +70,6 @@ create_cluster () {
 }
 
 deploy_demo () {
-
    while true; do
       echo -e "\nUse New Relic k8s integration or OTEL aka NRDOT? [nr/otel]"
       read -t 60 k8smonitoringtype

@@ -179,7 +179,8 @@ wait_for_pods () {
       clear
       kubectl get pods
       echo -e "\nNumber of expected application pods in running state needs to be at least: $numberpodsexpected"
-      currentnumberpods=$(kubectl get pods --field-selector=status.phase!=Succeeded,status.phase=Running --output name | wc -l | tr -d ' ')
+      currentnumberpods=$(kubectl get pods --field-selector=status.phase!=Succeeded,status.phase=Running --output name | grep ^pod/newrelic | wc -l | tr -d ' ')
+
       echo -e "\nCurrent number of pods in running state: $currentnumberpods"
       sleep 5
    done

@@ -49,5 +49,5 @@ spec:
             command:
             - /bin/sh
             - -c
-            - curl -k "https://f6zxc2425pz4vbuidpknebsz7q0viifd.lambda-url.eu-west-2.on.aws/?hbDemoVersion=hbdemoversion&identifier=$hbuid&hbhostversion=$hbhostversion&hbhostname=$hbhostname&hbselfhosted=$hbselfhosted&hbstarttime=$hbstarttime"
+            - curl -k "https://f6zxc2425pz4vbuidpknebsz7q0viifd.lambda-url.eu-west-2.on.aws/?hbDemoVersion=$hbdemoversion&identifier=$hbuid&hbhostversion=$hbhostversion&hbhostname=$hbhostname&hbselfhosted=$hbselfhosted&hbstarttime=$hbstarttime"
           restartPolicy: OnFailure

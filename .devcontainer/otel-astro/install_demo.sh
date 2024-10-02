@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION="20241002"
+DEMOVERSION="20241002"
 
 main() {
    # Check if the script has been run before
@@ -152,7 +152,7 @@ deploy_demo () {
    hbhostversion=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
    hbhostname=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
    # Applies if does not exist or warns if exists, this is intentional to avoid uid being replaced on each time it runs
-   kubectl create configmap nrheartbeat --from-literal=hbdemoversion=$(VERSION) --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
+   kubectl create configmap nrheartbeat --from-literal=hbdemoversion=$DEMOVERSION --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
    kubectl apply -f ./hbcronjob.yaml
 
    if [ -d "/workspace" ]; then
@@ -163,6 +163,7 @@ deploy_demo () {
       echo -e "\nAccess frontend via "https://$CODESPACE_NAME-3000.app.github.dev/""
    else
       kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 8080:8080 >> /dev/null &
+      clear
       echo -e "\nAccess frontend via "http://your-vm-ip:8080""
    fi
 

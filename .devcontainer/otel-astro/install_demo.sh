@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+VERSION="20241002"
 
 main() {
    # Check if the script has been run before
@@ -151,7 +152,7 @@ deploy_demo () {
    hbhostversion=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
    hbhostname=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
    # Applies if does not exist or warns if exists, this is intentional to avoid uid being replaced on each time it runs
-   kubectl create configmap nrheartbeat --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
+   kubectl create configmap nrheartbeat --from-literal=hbdemoversion=$(VERSION) --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
    kubectl apply -f ./hbcronjob.yaml
 
    if [ -d "/workspace" ]; then
@@ -169,17 +170,14 @@ deploy_demo () {
 
 
 wait_for_pods () {
-   if [[  $(echo $k8smonitoringtype | tr '[:upper:]' '[:lower:]') ==  "otel" ]]; then
-      declare -i numberpodsexpected=22
-   else
-      declare -i numberpodsexpected=25
-   fi
+
+   declare -i numberpodsexpected=20
    declare -i currentnumberpods=0
    
    while [[ $numberpodsexpected -ge $currentnumberpods ]];do
       clear
       kubectl get pods
-      echo -e "\nNumber of expected pods in running state needs to exceed: $numberpodsexpected"
+      echo -e "\nNumber of expected application pods in running state needs to be at least: $numberpodsexpected"
       currentnumberpods=$(kubectl get pods --field-selector=status.phase!=Succeeded,status.phase=Running --output name | wc -l | tr -d ' ')
       echo -e "\nCurrent number of pods in running state: $currentnumberpods"
       sleep 5

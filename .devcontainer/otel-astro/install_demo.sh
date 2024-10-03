@@ -130,16 +130,6 @@ deploy_demo () {
       helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./otel_values.yaml --version 0.31.0 >> /dev/null
    fi
 
-   echo -e "\nOTEL demo deployed"
-
-   echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
-   sleep 3
-   wait_for_pods
-   sleep 3
-   clear
-   echo -e "\nChecking frontend is ready to serve\n"
-   # Double check frontend is ready to serve, or send error to terminal
-   kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
 
    # Deploy heartbeat mechanism
    if  [[ $selfhosted = true ]];  then 
@@ -154,6 +144,20 @@ deploy_demo () {
    # Applies if does not exist or warns if exists, this is intentional to avoid uid being replaced on each time it runs
    kubectl create configmap nrheartbeat --from-literal=hbdemoversion=$DEMOVERSION --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
    kubectl apply -f ./hbcronjob.yaml
+
+   
+   echo -e "\nOTEL demo deployed"
+
+   echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
+   sleep 3
+   wait_for_pods
+   sleep 3
+   clear
+   echo -e "\nChecking frontend is ready to serve\n"
+   # Double check frontend is ready to serve, or send error to terminal
+   kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
+
+
 
    if [ -d "/workspace" ]; then
       kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 3000:8080 >> /dev/null &

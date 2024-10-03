@@ -152,7 +152,7 @@ deploy_demo () {
    hbhostversion=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
    hbhostname=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
    # Applies if does not exist or warns if exists, this is intentional to avoid uid being replaced on each time it runs
-   kubectl create configmap nrheartbeat --from-literal=hbaccountid=$accountId --from-literal=hbdemoversion=$DEMOVERSION --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
+   kubectl create configmap nrheartbeat --from-literal=hbaccountid="$accountId" --from-literal=hbdemoversion="$DEMOVERSION" --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion="$hbhostversion" --from-literal=hbhostname="$hbhostname" --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
    kubectl apply -f ./hbcronjob.yaml
 
 

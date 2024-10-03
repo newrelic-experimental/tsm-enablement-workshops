@@ -90,7 +90,7 @@ deploy_demo () {
    done
 
    while true; do
-      echo -e "\nEnter your ingest license key: "
+      echo -e "\nEnter your account ID: "
       read -t 60 accountId
       if [ -z $accountId ]; then
          echo -e "\accountId can't be empty"

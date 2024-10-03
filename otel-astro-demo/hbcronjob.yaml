@@ -46,11 +46,11 @@ spec:
                   configMapKeyRef:
                     name: nrheartbeat     
                     key: hbdemoversion
-              - name: hbdaccountid 
+              - name: hbaccountid 
                 valueFrom:
                   configMapKeyRef:
                     name: nrheartbeat     
-                    key: hbdaccountid  
+                    key: hbaccountid  
             command:
             - /bin/sh
             - -c

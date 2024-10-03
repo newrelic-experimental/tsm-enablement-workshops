@@ -142,10 +142,10 @@ deploy_demo () {
 
 
    # Deploy heartbeat mechanism
-   if  [[ $selfhosted = true ]];  then 
-      hbselfhosted="true"
-   else
+   if [ -d "/workspace" ]; then
       hbselfhosted="false"
+   else
+      hbselfhosted="true"
    fi
 
    hbstarttime=$(date +%s)

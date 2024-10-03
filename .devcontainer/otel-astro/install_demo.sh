@@ -92,8 +92,8 @@ deploy_demo () {
    while true; do
       echo -e "\nEnter your account ID: "
       read -t 60 accountId
-      if [ -z $accountId ]; then
-         echo -e "\accountId can't be empty"
+      if [ -z "$accountId" ]; then
+         echo -e "$accountId can't be empty"
          continue
       fi
       break

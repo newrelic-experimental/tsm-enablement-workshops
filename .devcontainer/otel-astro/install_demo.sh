@@ -175,7 +175,7 @@ wait_for_pods () {
    declare -i numberpodsexpected=20
    declare -i currentnumberpods=0
    
-   while [[ $numberpodsexpected -ge $currentnumberpods ]];do
+   while [[ $numberpodsexpected -gt $currentnumberpods ]];do
       clear
       kubectl get pods
       echo -e "\nNumber of expected application pods in running state needs to be at least: $numberpodsexpected"

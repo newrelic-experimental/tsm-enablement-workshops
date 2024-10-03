@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+DEMOVERSION="20241002"
 
 main() {
-
+   # Check if the script has been run before
    if [ -f "firstrun.txt" ]; then
        echo -e "\n\nInstall script already run. Delete /firstrun.txt to re-run installation." 
        echo -e "\n\nRestarting minikube..."
@@ -10,7 +11,7 @@ main() {
        sleep 3
        wait_for_pods
        echo -e "\nChecking frontend is ready to serve\n"
-      #Double check frontend is ready to serve, or send error to terminal
+      # Double check frontend is ready to serve, or send error to terminal
       kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
 
       if [ -d "/workspace" ]; then
@@ -57,7 +58,6 @@ create_cluster () {
 }
 
 deploy_demo () {
-
    while true; do
       echo -e "\nUse New Relic k8s integration or OTEL aka NRDOT? [nr/otel]"
       read -t 60 k8smonitoringtype
@@ -87,6 +87,16 @@ deploy_demo () {
          echo -e "\nPlease add New Relic browser script to browseragent.js"
          sleep 15
       fi
+   done
+
+   while true; do
+      echo -e "\nEnter your account ID: "
+      read -t 60 accountId
+      if [ -z "$accountId" ]; then
+         echo -e "$accountId can't be empty"
+         continue
+      fi
+      break
    done
 
    while true; do
@@ -130,6 +140,23 @@ deploy_demo () {
       helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./otel_values.yaml --version 0.31.0 >> /dev/null
    fi
 
+
+   # Deploy heartbeat mechanism
+   if [ -d "/workspace" ]; then
+      hbselfhosted="false"
+   else
+      hbselfhosted="true"
+   fi
+
+   hbstarttime=$(date +%s)
+   hbhostversion=$(. /etc/os-release; echo "$VERSION" | tr -d '[:blank:]')
+   hbhostname=$(. /etc/os-release; echo "$NAME" | tr -d '[:blank:]')
+   hbaccountid=$( echo "$accountId" | tr -d '[:blank:]')
+   # Applies if does not exist or warns if exists, this is intentional to avoid uid being replaced on each time it runs
+   kubectl create configmap nrheartbeat --from-literal=hbaccountid=$hbaccountid --from-literal=hbdemoversion=$DEMOVERSION --from-literal=hbuid=$(uuidgen) --from-literal=hbhostversion=$hbhostversion --from-literal=hbhostname=$hbhostname --from-literal=hbselfhosted=$hbselfhosted --from-literal=hbstarttime=$hbstarttime
+   kubectl apply -f ./hbcronjob.yaml
+
+
    echo -e "\nOTEL demo deployed"
 
    echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
@@ -138,8 +165,10 @@ deploy_demo () {
    sleep 3
    clear
    echo -e "\nChecking frontend is ready to serve\n"
-   #Double check frontend is ready to serve, or send error to terminal
+   # Double check frontend is ready to serve, or send error to terminal
    kubectl wait pod --for=condition=Ready -l app.kubernetes.io/component=frontend
+
+
 
    if [ -d "/workspace" ]; then
       kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 3000:8080 >> /dev/null &
@@ -149,6 +178,7 @@ deploy_demo () {
       echo -e "\nAccess frontend via "https://$CODESPACE_NAME-3000.app.github.dev/""
    else
       kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 8080:8080 >> /dev/null &
+      clear
       echo -e "\nAccess frontend via "http://your-vm-ip:8080""
    fi
 
@@ -156,18 +186,16 @@ deploy_demo () {
 
 
 wait_for_pods () {
-   if [[  $(echo $k8smonitoringtype | tr '[:upper:]' '[:lower:]') ==  "otel" ]]; then
-      declare -i numberpodsexpected=22
-   else
-      declare -i numberpodsexpected=25
-   fi
+
+   declare -i numberpodsexpected=20
    declare -i currentnumberpods=0
    
-   while [[ $numberpodsexpected -ge $currentnumberpods ]];do
+   while [[ $numberpodsexpected -gt $currentnumberpods ]];do
       clear
       kubectl get pods
-      echo -e "\nNumber of expected pods in running state needs to exceed: $numberpodsexpected"
-      currentnumberpods=$(kubectl get pods --field-selector=status.phase!=Succeeded,status.phase=Running --output name | wc -l | tr -d ' ')
+      echo -e "\nNumber of expected application pods in running state needs to be at least: $numberpodsexpected"
+      currentnumberpods=$(kubectl get pods --field-selector=status.phase!=Succeeded,status.phase=Running --output name | grep ^pod/newrelic | wc -l | tr -d ' ')
+
       echo -e "\nCurrent number of pods in running state: $currentnumberpods"
       sleep 5
    done

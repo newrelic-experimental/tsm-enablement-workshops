@@ -4,6 +4,8 @@
 
 echo -e "Building front end image..."
 
+export selfhosted=true
+
 BUILD_FOLDER="imagebuilder"
 
 mkdir $BUILD_FOLDER

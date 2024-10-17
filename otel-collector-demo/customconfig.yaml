@@ -1,0 +1,36 @@
+# US endpoint https://otlp.nr-data.net
+# EU endpoint https://otlp.eu01.nr-data.net
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+
+
+exporters:
+  otlp:
+    endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+    headers:
+      api-key: ${NEW_RELIC_LICENSE_KEY}
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp,hostmetrics]
+      processors: [batch]
+      exporters: 
+       - otlp
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]

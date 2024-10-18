@@ -6,8 +6,6 @@ echo -e "Building front end image..."
 
 export selfhosted=true
 
-echo "export selfhosted=true" >> /workspace/source_vars.sh
-
 BUILD_FOLDER="imagebuilder"
 
 mkdir $BUILD_FOLDER

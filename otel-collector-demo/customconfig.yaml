@@ -8,7 +8,15 @@ exporters:
 
 service:
   pipelines:
+    traces:
+      receivers: [nop]
+      processors: []
+      exporters: [nop]
     metrics:
+      receivers: [nop]
+      processors: []
+      exporters: [nop]
+    logs:
       receivers: [nop]
       processors: []
       exporters: [nop]

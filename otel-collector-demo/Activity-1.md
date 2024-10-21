@@ -4,6 +4,8 @@
 
 An [exporter](https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/README.md) defines how data leaves the collector. In order to view the data we need to export it to a New Relic account. To configure New Relic as a destination follow the following steps to set up an OTLP exporter:
 
+> Note: You will see "nop" in the confoguration. This is a placeholder for "no operation" to ensure the configuration is valid.
+
 1. Configure environment variable for license key secret:
 
 ```
@@ -15,7 +17,7 @@ export NEW_RELIC_LICENSE_KEY=your_license_key
 
 
 2. Add an OTLP exporter block to the `exporters:` section of [customconfig.yml](customconfig.yml)
-Be sure to add the correct OTLP endpoint value. Note that we chose to name our exporter "newrelic".
+Be sure to set the correct OTLP endpoint value. Note that we chose to name our exporter "newrelic" and we have removed the placeholder "nop" exporter
 
 ```
 exporters:

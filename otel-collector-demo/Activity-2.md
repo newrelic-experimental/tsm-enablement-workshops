@@ -12,13 +12,14 @@ To add the hostmetrics receiver to your collector do the following:
 
 ```
 receivers:
+  nop:
   hostmetrics:
     collection_interval: 30s
     scrapers:
       cpu:
         metrics:
           system.cpu.time:
-            enabled: false
+            enabled: true
 ```
 
 The receiver is configured, but we need to configure where the received data is sent. The hostmetrics receiver generates metrics, so we need to configure the `metrics` pipeline to receive metrics from `hostmetrics` receiver.
@@ -26,11 +27,20 @@ The receiver is configured, but we need to configure where the received data is 
 4. Update the metrics pipeline receiver to utilise the `hostmetrics` receiver (remove `nop`):
 
 ```
+service:
+  pipelines:
+    traces:
+      receivers: [nop]
+      processors: []
+      exporters: [otlp/newrelic]
     metrics:
       receivers: [hostmetrics]
       processors: []
-      exporters: 
-       - otlp
+      exporters: [otlp/newrelic]
+    logs:
+      receivers: [nop]
+      processors: []
+      exporters: [otlp/newrelic]
 ```
 
 5. Restart the collector to pickup the new configuration:
@@ -97,15 +107,23 @@ processors:
         - 'metric.name == "system.cpu.utilization" and attributes["state"] == "softirq"'
 ```
 
-3. As this data is metric data, we need to add the processor we just created to the metrics pipline processors list:
+3. As this data is metric data, we need to add the processor we just created to the metrics pipeline processors list:
 
 ```
 service:
   pipelines:
+    traces:
+      receivers: [nop]
+      processors: []
+      exporters: [otlp/newrelic]
     metrics:
-      receivers: [nop,hostmetrics]
-      processors: [filter/exclude_cpu_states, batch]
-      exporters: [otlp]
+      receivers: [hostmetrics]
+      processors: [filter/exclude_cpu_states]
+      exporters: [otlp/newrelic]
+    logs:
+      receivers: [nop]
+      processors: []
+      exporters: [otlp/newrelic]
 ```
 
 4. Restart collector to pickup the configuration:

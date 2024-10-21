@@ -18,7 +18,7 @@ receivers:
       cpu:
         metrics:
           system.cpu.time:
-            enabled: false
+            enabled: true
 ```
 
 The receiver is configured, but we need to configure where the received data is sent. The hostmetrics receiver generates metrics, so we need to configure the `metrics` pipeline to receive metrics from `hostmetrics` receiver.
@@ -29,8 +29,7 @@ The receiver is configured, but we need to configure where the received data is 
     metrics:
       receivers: [nop,hostmetrics]
       processors: [batch]
-      exporters: 
-       - otlp
+      exporters: [otlp]
 ```
 
 5. Restart the collector to pickup the new configuration:
@@ -64,7 +63,7 @@ Adding this scraper simply involves adding it as an addintional configuration to
 ```
   ...
   hostmetrics:
-    collection_interval: 30s
+    collection_interval: 60s
     scrapers:
       cpu:
         metrics:

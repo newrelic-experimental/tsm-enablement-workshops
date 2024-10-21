@@ -2,18 +2,18 @@
 
 ## Task 1: Add a receiver to collect host CPU metrics 
 
-Receviers allow the collector to receive data. There are numerous receivers available for many different technologies. For this example we want to gather CPU metrics. The "hostmetrics" receiver can provide this data. Read more about the [hostmetrics receiver here](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md).
+Receivers allow the collector to receive data. There are numerous receivers available for many different sources. For this example we want to gather CPU metrics. The "hostmetrics" receiver can provide this data. Read more about the [hostmetrics receiver here](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md).
 
-To add the hostmetrics recever to your collector do the follow:
+To add the hostmetrics receiver to your collector do the following:
 
 1. Review the documentation for [hostmetrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md)
 2. Add a `hostmetric` block to the `receivers` section of [customconfig.yml](customconfig.yml)
-3. Set the colleciton_interval to 60 seconds and add a `system.cpu.time` scraper as below:
+3. Set the collection interval to 30 seconds and add a `system.cpu.time` scraper as below:
 
 ```
 receivers:
   hostmetrics:
-    collection_interval: 60s
+    collection_interval: 30s
     scrapers:
       cpu:
         metrics:
@@ -21,19 +21,19 @@ receivers:
             enabled: false
 ```
 
-The receiver is configured, but we need to configure where the receved data is sent. The hostmetrics receiver generates metrics, so we need to configure the `metrics` pipeline to receive metrics from `hostmetrics`.
+The receiver is configured, but we need to configure where the received data is sent. The hostmetrics receiver generates metrics, so we need to configure the `metrics` pipeline to receive metrics from `hostmetrics` receiver.
 
 4. Add the `hostmetrics` receiver to the list of receivers in the `metrics` pipeline
 
 ```
     metrics:
-      receivers: [otlp,hostmetrics]
+      receivers: [nop,hostmetrics]
       processors: [batch]
       exporters: 
        - otlp
 ```
 
-5. Restart the colloctor to pickup the new configuration:
+5. Restart the collector to pickup the new configuration:
 ```
 ./collector.sh restart
 ```
@@ -77,18 +77,19 @@ Adding this scraper simply involves adding it as an addintional configuration to
 
 
 
-# TASK 2
-## Exclude system.cpu metrics for cpu states interrupt, nice, softirq
-https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/filterprocessor/README.md
+##  TASK 2: Filtering metrics with a processor
+You may have noticed that the hostmetrics CPU scraper gathers data for multiple states of each cpu such as `idle`, `user`, `system`, `interrupt`, etc. Some of these states dont offer us much value so lets filter these out to save on ingest overheads.
 
-Configure filter processor in processor block
+We can use [OTel Processors](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/README.md) to manipulate the data running through the OTel collector pipeline. As with receivers there are multiple processors available to choose from. For this example we will use the standard [Filter Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/filterprocessor/README.md)
 
-Your filter configuration in processors block should look like this
+For this example lets remove the states "interrupt", "nice" and "softirq" from our CPU utilization data:
+
+1. Add a new `filter` configuration block to the `processors:` section of the configuration. We should name this configuration so we can reference it later by following the type name with `/[name]`, for instance: `filter/exclude_cpu_states:`
+2. Add a metric datapoint configuration for each state to drop as follows:
 
 ```
 processors:
-  # remove system.cpu metrics for states
-  filter/exclude_cpu_utilization:
+  filter/exclude_cpu_states:
     metrics:
       datapoint:
         - 'metric.name == "system.cpu.utilization" and attributes["state"] == "interrupt"'
@@ -96,17 +97,42 @@ processors:
         - 'metric.name == "system.cpu.utilization" and attributes["state"] == "softirq"'
 ```
 
-Add your filter processor in your metrics pipeline in the service block
-Your configuration for metrics pipeline in service block should look like this
+3. As this data is metric data, we need to add the processor we just created to the metrics pipline processors list:
 
 ```
 service:
   pipelines:
     metrics:
-      receivers: [otlp,hostmetrics]
-      processors: [filter/exclude_cpu_utilization, batch]
+      receivers: [nop,hostmetrics]
+      processors: [filter/exclude_cpu_states, batch]
       exporters: [otlp]
 ```
 
-## Restart collector 
-> ./collector.sh restart
+4. Restart collector to pickup the configuration:
+```
+./collector.sh restart
+```
+
+5. Check the in New Relic states have been correctly removed from recent data:
+```
+from Metric select latest(system.cpu.utilization) where newrelic.source = 'api.metrics.otlp' facet cpu,state limit max since 2 minutes ago
+```
+
+## Challenge 2: Filter all CPU metrics
+Our filter currently filters out the undesired states from the `system.cpu.utilization metric`, but those states are still being ingested for the `system.cpu.time` metric. Reconfigure the filter processor so that the states are removed from *all* system.cpu.* metrics.
+
+> Hint: You may find browsing the [OpenTelemetry transform language](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md) documentation for available functions  that supports a regular expression useful here.
+
+<details>
+  <summary>Challenge 2 Solution</summary>
+
+Here is one solution. We use the [IsMatch()](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#ismatch) function to wildcard both the metric name and also to refactor the list of states:
+
+```
+processors:
+  filter/exclude_cpu_states:
+    metrics:
+      datapoint:
+        - 'IsMatch(metric.name, "system.cpu.*") and IsMatch(attributes["state"], "^(interrupt|nice|softirq)$")'
+```
+</details>

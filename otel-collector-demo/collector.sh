@@ -33,6 +33,15 @@ restart () {
    echo -e "\nCollector restarted..."
 }
 
+validate(){
+   res=$(otelcol validate --config=customconfig.yaml 2>&1 & )
+   if [[ $res == "" ]]; then
+      echo "No errors found"
+   else
+      echo $res
+   fi
+}
+
 generate_log_entry () {
     for run in {1..5}; do
     echo '{"log":"INFO: This is a log line containing piidata","stream":"stdout","piidata":"123456789"}' >> custom.log 

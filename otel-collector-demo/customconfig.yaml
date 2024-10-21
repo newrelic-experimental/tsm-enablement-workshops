@@ -1,8 +1,3 @@
-# OTEL_EXPORTER_OTLP_ENDPOINT variable
-# US base endpoint https://otlp.nr-data.net don't forget to add port e.g https://otlp.nr-data.net:4318
-# EU base endpoint https://otlp.eu01.nr-data.net don't forget to add port e.g https://otlp.eu01.nr-data.net:4318
-# https://docs.newrelic.com/docs/opentelemetry/best-practices/opentelemetry-otlp/
-
 receivers:
   nop:
 

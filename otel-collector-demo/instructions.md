@@ -7,7 +7,8 @@ Please refer to the terminal instructions to provide necessary configuration for
 ----
 
 # Instructions
-Configure your collector endpoint and new relic license key as environment variables
+Configure your collector endpoint including port and new relic license key as environment variables
+See: https://docs.newrelic.com/docs/opentelemetry/best-practices/opentelemetry-otlp/
 
 > export NEW_RELIC_LICENSE_KEY=your_license_key
 > export OTEL_EXPORTER_OTLP_ENDPOINT=your_otel_endpoint

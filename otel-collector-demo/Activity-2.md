@@ -8,12 +8,7 @@ Your configuration for receivers block should look like this
 
 ```
 receivers:
-  otlp:
-    protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
-      http:
-        endpoint: 0.0.0.0:4318
+  nop:
   hostmetrics:
     # Default collection interval is 60s. Lower if you need finer granularity.
     collection_interval: 60s
@@ -36,7 +31,7 @@ Your configuration for logs pipeline in service block should look like this
 service:
   pipelines:
     logs:
-      receivers: [otlp,filelog]
+      receivers: [nop,filelog]
       processors: [batch]
       exporters: [otlp]
 ```
@@ -72,7 +67,7 @@ Your configuration forlogs pipeline in service block should look like this
 service:
   pipelines:
     logs:
-      receivers: [otlp,filelog]
+      receivers: [nop,filelog]
       processors: [transform, batch]
       exporters: [otlp]
 ```

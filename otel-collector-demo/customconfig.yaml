@@ -6,28 +6,14 @@
 receivers:
   nop:
 
-processors:
-  batch:
-
+processors: 
 
 exporters:
-  otlp:
-    endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}
-    headers:
-      api-key: ${NEW_RELIC_LICENSE_KEY}
+  nop:
 
 service:
   pipelines:
-    traces:
-      receivers: [nop]
-      processors: [batch]
-      exporters: [otlp]
     metrics:
       receivers: [nop]
-      processors: [batch]
-      exporters: 
-       - otlp
-    logs:
-      receivers: [nop]
-      processors: [batch]
-      exporters: [otlp]
+      processors: []
+      exporters: [nop]

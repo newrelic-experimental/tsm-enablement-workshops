@@ -45,7 +45,7 @@ from Metric select sum(system.cpu.time)  where newrelic.source = 'api.metrics.ot
 
 ## Challenge 1: Configure your own host metric
 
-Use the [OTel hostmetrics documentation]((https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md)) to extend your collector configuration gather CPU *utilization* data.
+Use the [OTel hostmetrics documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md) to extend your collector configuration gather CPU *utilization* data.
 
 > Hint: You will need to configure an additional metric scraper.
 

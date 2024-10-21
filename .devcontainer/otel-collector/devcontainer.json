@@ -4,14 +4,7 @@
     "vscode": {
       "extensions": [],
       "settings": {
-        "terminal.integrated.sendKeybindingsToShell": true,
-        "terminal.integrated.shell.linux": "bash",
-        "terminal.integrated.profiles.linux": {
-          "bash (container default)": {
-            "path": "/usr/bin/bash",
-            "overrideName": true
-      }
-    }
+        "terminal.integrated.sendKeybindingsToShell": true
       }
     },
     "codespaces": {

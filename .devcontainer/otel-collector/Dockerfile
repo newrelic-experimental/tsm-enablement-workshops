@@ -20,3 +20,7 @@ COPY nrheartbeat.sh /
 RUN chmod +x /nrheartbeat.sh
 
 USER $USERNAME
+
+SHELL [ "/bin/bash", "-c" ]
+
+ENV SHELL=/bin/bash

@@ -4,10 +4,7 @@
 # https://docs.newrelic.com/docs/opentelemetry/best-practices/opentelemetry-otlp/
 
 receivers:
-  otlp:
-    protocols:
-      http:
-        endpoint: 127.0.0.1:4318
+  nop:
 
 processors:
   batch:
@@ -22,15 +19,15 @@ exporters:
 service:
   pipelines:
     traces:
-      receivers: [otlp]
+      receivers: [nop]
       processors: [batch]
       exporters: [otlp]
     metrics:
-      receivers: [otlp]
+      receivers: [nop]
       processors: [batch]
       exporters: 
        - otlp
     logs:
-      receivers: [otlp]
+      receivers: [nop]
       processors: [batch]
       exporters: [otlp]

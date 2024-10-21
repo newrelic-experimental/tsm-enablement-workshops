@@ -7,12 +7,7 @@ Your configuration for receivers block should look like this
 
 ```
 receivers:
-  otlp:
-    protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
-      http:
-        endpoint: 0.0.0.0:4318
+  nop:
   hostmetrics:
     # Default collection interval is 60s. Lower if you need finer granularity.
     collection_interval: 60s
@@ -33,16 +28,16 @@ Your configuration for metrics pipeline in service block should look like this
 service:
   pipelines:
     traces:
-      receivers: [otlp]
+      receivers: [nop]
       processors: [batch]
       exporters: [otlp]
     metrics:
-      receivers: [otlp,hostmetrics]
+      receivers: [nop,hostmetrics]
       processors: [batch]
       exporters: 
        - otlp
     logs:
-      receivers: [otlp]
+      receivers: [nop]
       processors: [batch]
       exporters: [otlp]
 ```
@@ -76,7 +71,7 @@ Your configuration for metrics pipeline in service block should look like this
 service:
   pipelines:
     metrics:
-      receivers: [otlp,hostmetrics]
+      receivers: [nop,hostmetrics]
       processors: [filter/exclude_cpu_utilization, batch]
       exporters: [otlp]
 ```

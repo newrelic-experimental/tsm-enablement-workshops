@@ -15,13 +15,12 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
   hostmetrics:
-    # Default collection interval is 60s. Lower if you need finer granularity.
-    collection_interval: 60s
+    collection_interval: 30s
     scrapers:
       cpu:
         metrics:
           system.cpu.time:
-            enabled: false
+            enabled: true
           system.cpu.utilization:
             enabled: true
   filelog:
@@ -36,9 +35,9 @@ Your configuration for logs pipeline in service block should look like this
 service:
   pipelines:
     logs:
-      receivers: [otlp,filelog]
-      processors: [batch]
-      exporters: [otlp]
+      receivers: [filelog]
+      processors: []
+      exporters: [otlp/newrelic]
 ```
 
 ## Restart collector 
@@ -56,7 +55,7 @@ Your configuration for processors look like this
 
 ```
 processors:
-  transform:
+  transform/removepii:
     log_statements:
     - context: log
       statements:
@@ -72,9 +71,9 @@ Your configuration forlogs pipeline in service block should look like this
 service:
   pipelines:
     logs:
-      receivers: [otlp,filelog]
-      processors: [transform, batch]
-      exporters: [otlp]
+      receivers: [filelog]
+      processors: [transform/removepii]
+      exporters: [otlp/newrelic]
 ```
 
 ## Send new log entries to our custom.log

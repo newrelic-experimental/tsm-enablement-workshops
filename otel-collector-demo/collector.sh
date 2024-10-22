@@ -19,7 +19,7 @@ stop () {
    echo -e "\nStop collector...\n"
    pkill otelcol > collector.log 2>&1 & 
    clear
-   echo -e "\nCollector stoped..."
+   echo -e "\nCollector stopped..."
   
 }
 
@@ -43,9 +43,13 @@ validate(){
 }
 
 generate_log_entry () {
-    for run in {1..5}; do
-    echo '{"log":"INFO: This is a log line containing piidata","stream":"stdout","piidata":"123456789"}' >> custom.log 
-    done  
+    uuid=$(uuidgen)
+    echo "{\"uuid\":\"$uuid\",\"log\":\"INFO: [1] This data is just some generated data\",\"demo\":\"otel-collector-demo\",\"clientId\":\"112233\"}" >> custom.log 
+    echo "{\"uuid\":\"$uuid\",\"log\":\"INFO: [2] Character name: Paddington Bear\",\"demo\":\"otel-collector-demo\",\"clientId\":\"112233\", \"price\": \"23.50\" }" >> custom.log 
+    echo "{\"uuid\":\"$uuid\",\"log\":\"INFO: [3] Character name: Pooh Bear\",\"demo\":\"otel-collector-demo\",\"clientId\":\"112233\", \"price\": \"18.20\" }" >> custom.log 
+    echo "{\"uuid\":\"$uuid\",\"log\":\"DEBUG: [4] This is a log line containing piidata in the form of a contact@newrelic.com email address\",\"stream\":\"stdout\",\"piidata\":\"123456789\",\"demo\":\"otel-collector-demo\",\"clientId\":\"112233\"}" >> custom.log  
+    sleep 1
+    echo "{\"uuid\":\"$uuid\",\"log\":\"INFO: [5] This line is delivered after a small delay\",\"demo\":\"otel-collector-demo\",\"clientId\":\"112233\"}" >> custom.log 
 }
 
 main "$@"

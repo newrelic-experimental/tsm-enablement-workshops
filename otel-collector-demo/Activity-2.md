@@ -7,7 +7,7 @@ Receivers allow the collector to receive data. There are numerous receivers avai
 To add the hostmetrics receiver to your collector do the following:
 
 1. Review the documentation for [hostmetrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md)
-2. Add a `hostmetric` block to the `receivers` section of [customconfig.yml](customconfig.yml)
+2. Add a `hostmetric` block to the `receivers` section of [customconfig.yaml](customconfig.yaml)
 3. Set the collection interval to 30 seconds and add a `system.cpu.time` scraper as below:
 
 ```

@@ -1,6 +1,7 @@
 {
   "name": "nr-terraform-demo-codespaces",
   "build": { "dockerfile": "Dockerfile" },
+  "onCreateCommand": ["bash", "-i", "-c", "/nrheartbeat.sh"],
   "workspaceMount": "source=${localWorkspaceFolder}/terraform-demo,target=/workspace,type=bind",
   "workspaceFolder": "/workspace"
 }

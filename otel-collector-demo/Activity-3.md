@@ -94,7 +94,7 @@ Attributes:
 ## Task 3: Remove unnecessary attributes from the log messages
 
 Each log line in our exmple log data is a valid JSON string. New Relic receives this and converts each attribute into a seperately addressable columns in the data.
-Sometimes you may want to filter out, or 'drop' attributes that don't offer any value. For instance in the example log data the clientId field is always the same. Lets drop this from the ingest data before we send it.
+Sometimes you may want to filter out, or 'drop' attributes that don't offer any value. For instance in the example log data the `clientId` field is always the same. Lets drop this from the ingest data before we send it.
 
 There are many ways to solve this, in this case we will use two processors: first we need to convert the log line string to a set of attributes and then we need to drop the attributes we do not need. 
 
@@ -112,7 +112,7 @@ processors:
 ```
 > This processor transforms log lines. The log line body is converted to attributes using [`ParseJSON()`](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#parsejson). We then discard the body.
 
-2. Add the transform processor reference to the list of `processors:` for the logs pipline:
+2. Add the transform processor reference to the list of `processors:` for the logs pipeline:
 
 ```
 service:
@@ -185,13 +185,14 @@ from Log select uuid, message, clientId where demo='otel-collector-demo'
 This is only a toy example, but in larger scale systems there may be a lot of data that needs delivering. You can control how the data is batched and sent to New Relic to improve the efficiency of the data delivery. It is generally recommended to implement some batching.
 
 1. View the existing log line batch information
-When you generate the logs there is a short two second delay artifically introduced between lines 4 and 5. When you view your existing logs in New Relic, observe that the field `newrelic.logs.batchIndex` indicates the index of the record in the batch of logs received. You should see that the first 4 log lines are indexed 1-4 but the fifth log line has an index of 1. This tells us that the 5th line was received in a differnt batch to the first four.
+
+When you generate the logs there is a short two second delay artifically introduced between lines 4 and 5. When you view your existing logs in New Relic, observe that the field `newrelic.logs.batchIndex` indicates the index of the record in the batch of logs received. You should see that the first four log lines are indexed 1-4 but the fifth log line has an index of 1. This tells us that the fifth line was received in a different batch to the first four.
 
 ```
 from Log select uuid, newrelic.logs.batchIndex, message where demo='otel-collector-demo' 
 ```
 
-2. Add a [batch processor](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/batchprocessor/README.md) to the `processors:` block
+2. Add a [batch processor](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/batchprocessor/README.md) to the `processors:` block with a five second timeout:
 
 ```
 processors:
@@ -199,7 +200,7 @@ processors:
   batch:
     timeout: 5s
 ```
-> The batch can be configured by both size and time, in this case we simply set to 5 seconds, which is enough time for all 5 log lines to be batched and sent together.
+> The batch can be configured by both size and time, in this case we simply set to 5 seconds, which is enough time (usually) for all 5 log lines to be batched and sent together. The default is 200ms.
 
 3. Add the batch processor reference to the list of `processors:` for the logs pipeline:
 ```
@@ -225,8 +226,10 @@ from Log select uuid, newrelic.logs.batchIndex, message where demo='otel-collect
 
 > You should see that the fifth log line is now indexed 5 in the batch *most of the time.* (It may sometimes stil lcome in the next batch depending on the timing of running the commands)
 
+> This was just a demonstration of the batch processor. The File Log receiver has controls over polling interval too that may be useful.
 
-# Challenge 1: Maniplating data before ingest
+
+## Challenge 1: Maniplating data before ingest
 You may notice that some of the log lines include a `price` attribute. This value is currently a string. In order to easily perform math functions on it when its received it would be good to convert it to a number. 
 
 Use what you have learnt already about the [attributes processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/attributesprocessor) to convert the `price` field on those records to a `double` type.
@@ -238,7 +241,9 @@ Use what you have learnt already about the [attributes processor](https://github
 <summary>More hints for challenge 1!</summary>
 
 > Hint: You can use the existing attribute processor or add a new one. Why might a new one be better? 
+
 > Hint: Don't forget to add your processor to the logs pipeline processor list!
+
 </details>
 
 <details>
@@ -256,7 +261,7 @@ processors:
         converted_type: double
 ```
 
-And remember to add the reference to the processor top the log pipline processors list:
+And remember to add the reference to the processor top the log pipeline processors list:
 
 ```
 service:
@@ -283,8 +288,11 @@ Create a new attribute `price_dollars` that contains the adjusted price based on
 <summary>More hints for challenge 2!</summary>
 
 > Hint: You can *set* attributes with the [transform processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/transformprocessor/README.md), we've already used one of those. 
+
 > Hint: The current price attribute is available in the value `attributes["price"]`
-> Hint: Don't forget to add the reference to your processor in the logs pipline processors list
+
+> Hint: Don't forget to add the reference to your processor in the logs pipeline processors list
+
 > Hint: Got `<nil>` type errors blowing up the collector? Not every record has a price attribute. You'll need to take that *condition* into account.
 
 </details>

@@ -275,7 +275,7 @@ service:
 </details>
 
 
-## Challenge 2 (tricky!):
+## Challenge 2: Pre-ingest currency conversion (tricky!)
 Unfortunately the price currency data being reported is in credits, we need to convert it to dollars! Fortunately the exchange rate is simple, we need to multiply by 1.2.
 
 Create a new attribute `price_dollars` that contains the adjusted price based on the 1.2 exchange rate.

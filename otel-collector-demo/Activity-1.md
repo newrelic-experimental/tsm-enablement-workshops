@@ -16,7 +16,7 @@ export NEW_RELIC_LICENSE_KEY=your_license_key
 
 
 
-2. Add an OTLP exporter block to the `exporters:` section of [customconfig.yml](customconfig.yml)
+2. Add an OTLP exporter block to the `exporters:` section of [customconfig.yml](customconfig.yaml)
 Be sure to set the correct OTLP endpoint value. Note that we chose to name our exporter "newrelic" and we have removed the placeholder "nop" exporter
 
 ```

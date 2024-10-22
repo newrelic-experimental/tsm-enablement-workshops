@@ -159,3 +159,5 @@ processors:
 ## Next Step: Activity 3
 
 You've successfully collected, processed and shipped some data. Continue to [Activity 3](Activity-3.md) to learn how to ship and maniuplate logs.
+
+> If you had trouble, the full solution for this activity can be found [here](./solutions/Activity-2-solution.yaml)

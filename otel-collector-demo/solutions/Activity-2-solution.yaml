@@ -1,0 +1,40 @@
+# This is the configuration once Activity  1 and 2 is completed. Remember to set yout endpoint!
+
+receivers:
+  nop:
+  hostmetrics:
+    collection_interval: 30s
+    scrapers:
+      cpu:
+        metrics:
+          system.cpu.time:
+            enabled: true  
+          system.cpu.utilization:
+            enabled: true
+
+processors:
+  filter/exclude_cpu_states:
+    metrics:
+      datapoint:
+        - 'IsMatch(metric.name, "system.cpu.*") and IsMatch(attributes["state"], "^(interrupt|nice|softirq)$")'
+
+exporters:
+  otlp/newrelic:
+    endpoint: your_otel_endpoint_here
+    headers:
+      api-key: ${NEW_RELIC_LICENSE_KEY}
+
+service:
+  pipelines:
+    traces:
+      receivers: [nop]
+      processors: []
+      exporters: [otlp/newrelic]
+    metrics:
+      receivers: [hostmetrics]
+      processors: [filter/exclude_cpu_states]
+      exporters: [otlp/newrelic]
+    logs:
+      receivers: [nop]
+      processors: []
+      exporters: [otlp/newrelic]

@@ -1,0 +1,74 @@
+# This is the configuration once Activity 3 is completed. Remember to set yout endpoint!
+
+receivers:
+  nop:
+  hostmetrics:
+    collection_interval: 30s
+    scrapers:
+      cpu:
+        metrics:
+          system.cpu.time:
+            enabled: true  
+          system.cpu.utilization:
+            enabled: true
+  filelog/custom_file:
+    include:
+      - /workspace/custom.log
+
+processors:
+  batch:
+    timeout: 5s
+  filter/exclude_cpu_states:
+    metrics:
+      datapoint:
+        - 'IsMatch(metric.name, "system.cpu.*") and IsMatch(attributes["state"], "^(interrupt|nice|softirq)$")'
+  transform/logs_to_attributes:
+    log_statements:
+    - context: log
+      statements:
+          - merge_maps(attributes, ParseJSON(body), "upsert")
+          - set(body, "")
+  attributes/remove_unnecessary:
+    actions:
+      - key: clientId
+        action: delete
+  attributes/convert_price:
+    actions:
+      - key: price
+        action: convert
+        converted_type: double
+  transform/price_to_dollars:
+    log_statements:
+      - context: log
+        statements:
+            - set(attributes["price_dollars"], attributes["price"] * 1.2)
+        conditions:
+          - attributes["price"] != nil
+
+exporters:
+  otlp/newrelic:
+    endpoint: your_otel_endpoint_here
+    headers:
+      api-key: ${NEW_RELIC_LICENSE_KEY}
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    traces:
+      receivers: [nop]
+      processors: []
+      exporters: [otlp/newrelic]
+    metrics:
+      receivers: [hostmetrics]
+      processors: [filter/exclude_cpu_states]
+      exporters: [otlp/newrelic]
+    logs:
+      receivers: [filelog/custom_file]
+      processors: 
+        - transform/logs_to_attributes
+        - attributes/remove_unnecessary
+        - attributes/convert_price
+        - transform/price_to_dollars
+        - batch
+      exporters: [otlp/newrelic,debug]

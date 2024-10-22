@@ -7,7 +7,7 @@ Receivers allow the collector to receive data. There are numerous receivers avai
 To add the hostmetrics receiver to your collector do the following:
 
 1. Review the documentation for [hostmetrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md)
-2. Add a `hostmetric` block to the `receivers` section of [customconfig.yml](customconfig.yml)
+2. Add a `hostmetric` block to the `receivers` section of [customconfig.yaml](customconfig.yaml)
 3. Set the collection interval to 30 seconds and add a `system.cpu.time` scraper as below:
 
 ```
@@ -88,7 +88,7 @@ Adding this scraper simply involves adding it as an addintional configuration to
 
 
 ##  TASK 2: Filtering metrics with a processor
-You may have noticed that the hostmetrics CPU scraper gathers data for multiple states of each cpu such as `idle`, `user`, `system`, `interrupt`, etc. Some of these states dont offer us much value so lets filter these out to save on ingest overheads.
+You may have noticed that the hostmetrics CPU scraper gathers data for multiple states of each cpu such as `idle`, `user`, `system`, `interrupt`, etc. Some of these states don't offer us much value so lets filter these out to save on ingest overheads.
 
 We can use [OTel Processors](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/README.md) to manipulate the data running through the OTel collector pipeline. As with receivers there are multiple processors available to choose from. For this example we will use the standard [Filter Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/filterprocessor/README.md)
 

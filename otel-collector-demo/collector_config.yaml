@@ -1,5 +1,5 @@
 # Bare bones OpenTelemetry configuration. 
-# Follow the lab instructions here: https://github.com/newrelic-experimental/tsm-enablement-workshops/blob/main/otel-collector-demo/instructions.md
+# Follow the lab instructions here: https://github.com/newrelic-experimental/tsm-enablement-workshops/blob/main/otel-collector-demo/
 
 receivers:
   nop:

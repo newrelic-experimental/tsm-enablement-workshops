@@ -3,7 +3,7 @@
   "customizations": {
     "codespaces": {
       "openFiles": [
-        "instructions.md"
+        ".devcontainer/instructions.md"
       ]
     }
   },

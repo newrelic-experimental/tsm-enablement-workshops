@@ -38,7 +38,7 @@ exporters:
 
 3. Configure the services pipelines to use the New Relic exporter we just defined:
 
-All the piplines currently export to "nop". Replace these with the value `otllp/newrelic`. This will cause all the trace, metric and logs piplines to deliver data to New Relic.
+All the piplines currently export to "nop". Replace these with the value `otlp/newrelic`. This will cause all the trace, metric and logs piplines to deliver data to New Relic.
 
 ```
 service:

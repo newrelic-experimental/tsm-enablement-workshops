@@ -1,0 +1,12 @@
+{
+  "name": "nr-no-demo",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "instructions.md"
+      ]
+    }
+  },
+  "image": "mcr.microsoft.com/vscode/devcontainers/base:bullseye"
+}
+

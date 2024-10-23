@@ -1,0 +1,25 @@
+# Bare bones OpenTelemetry configuration. 
+# Follow the lab instructions here: https://github.com/newrelic-experimental/tsm-enablement-workshops/blob/main/otel-collector-demo/
+
+receivers:
+  nop:
+
+processors: 
+
+exporters:
+  nop:
+
+service:
+  pipelines:
+    traces:
+      receivers: [nop]
+      processors: []
+      exporters: [nop]
+    metrics:
+      receivers: [nop]
+      processors: []
+      exporters: [nop]
+    logs:
+      receivers: [nop]
+      processors: []
+      exporters: [nop]

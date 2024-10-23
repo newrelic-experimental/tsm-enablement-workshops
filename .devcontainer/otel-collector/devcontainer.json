@@ -1,0 +1,27 @@
+{
+  "name": "nr-otel-collector",
+  "customizations": {
+    "vscode": {
+      "extensions": [],
+      "settings": {
+        "terminal.integrated.sendKeybindingsToShell": true,
+        "remote.autoForwardPorts": false
+      }
+    },
+    "codespaces": {
+      "openFiles": [
+        "collector_config.yaml"
+      ]
+    }
+  },
+  "containerUser": "demouser",
+  "onCreateCommand": ["bash", "-i", "-c", "/nrheartbeat.sh"],
+  "build": { "dockerfile": "Dockerfile" },
+  "workspaceMount": "source=${localWorkspaceFolder}/otel-collector-demo,target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/guiyomh/features/vim:0": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
+}
+

@@ -52,4 +52,8 @@ generate_log_entry () {
     echo "{\"uuid\":\"$uuid\",\"log\":\"INFO: [5] This line is delivered after a small delay\",\"demo\":\"otel-collector-demo\",\"clientId\":\"112233\"}" >> custom.log 
 }
 
+generate_trace_data () {
+   telemetrygen traces --otlp-insecure --duration 5s > collector.log 2>&1 &
+}
+
 main "$@"

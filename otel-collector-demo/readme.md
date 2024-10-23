@@ -8,7 +8,7 @@ The lab runs in a GitHub codespace, which you can do for free for a period each 
 - Go to the [repo home](https://github.com/newrelic-experimental/tsm-enablement-workshops) and Click the greeen `<> Code` button.
 - Select the `Codespaces` tab
 - Click the three dots ellipsis `...` and select `New with options...`
-- **IMPORTANT!** From the `Dev container configuration` option choose `otel-collector`
+- **IMPORTANT!** From the `Dev container configuration` option choose `nr-otel-collector`
 - Click `Create codespace`
 - Wait for the codespace to launch and the terminal to appear.
 

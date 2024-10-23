@@ -1,0 +1,12 @@
+{
+  "name": "NO-DEMO-SELECTED",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        ".devcontainer/instructions.md"
+      ]
+    }
+  },
+  "image": "mcr.microsoft.com/devcontainers/base:alpine"
+}
+

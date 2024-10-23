@@ -7,6 +7,6 @@
       ]
     }
   },
-  "image": "mcr.microsoft.com/vscode/devcontainers/base:bullseye"
+  "image": "mcr.microsoft.com/devcontainers/base:alpine"
 }
 

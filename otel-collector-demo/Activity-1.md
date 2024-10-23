@@ -1,5 +1,8 @@
 # Activity 1
 
+The codespace already has an OpenTelemetry collector installed and ready to run. You will configure it by editing the configuration in `collector_config.yaml`.
+This lab is made up of a number of Tasks and Challenges to help build your understanding of the collector architecture.
+
 ## Task 1: Configure the collector to send data to New Relic
 
 An [exporter](https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/README.md) defines how data leaves the collector. In order to view the data we need to export it to a New Relic account. To configure New Relic as a destination follow the following steps to set up an OTLP exporter:
@@ -16,7 +19,7 @@ export NEW_RELIC_LICENSE_KEY=your_license_key
 
 
 
-2. Add an OTLP exporter block to the `exporters:` section of [customconfig.yaml](customconfig.yaml)
+2. Add an OTLP exporter block to the `exporters:` section of [collector_config.yaml](collector_config.yaml)
 Be sure to set the correct OTLP endpoint value. Note that we chose to name our exporter "newrelic" and we have removed the placeholder "nop" exporter
 
 ```

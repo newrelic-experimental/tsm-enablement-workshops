@@ -9,7 +9,7 @@ In order to gather data from file we need a receiver that will watch the file fo
 In this task you will onfigure the collector to ship data using this receiver from a single file `custom.log` to New Relic.
 
 1. Review the documentation for the [File Log Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver)
-2. In the receivers section of `customconfig.yaml` add a new configuration block to configure the receveiver to watch the `custom.log` file:
+2. In the receivers section of `collector_config.yaml` add a new configuration block to configure the receveiver to watch the `custom.log` file:
 
 ```
 receivers:

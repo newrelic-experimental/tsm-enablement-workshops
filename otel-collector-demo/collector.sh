@@ -8,7 +8,7 @@ main() {
 start () {
    
    echo -e "\nStarting collector...\n"
-   otelcol --config=customconfig.yaml > collector.log 2>&1 & 
+   otelcol --config=collector_config.yaml > collector.log 2>&1 & 
    clear
    echo -e "\nCollector started..."
   
@@ -28,13 +28,13 @@ restart () {
    echo -e "\nRestarting collector...\n"
    pkill otelcol > collector.log 2>&1 & 
    sleep 5
-   otelcol --config=customconfig.yaml > collector.log 2>&1 & 
+   otelcol --config=collector_config.yaml > collector.log 2>&1 & 
    clear
    echo -e "\nCollector restarted..."
 }
 
 validate(){
-   res=$(otelcol validate --config=customconfig.yaml 2>&1 & )
+   res=$(otelcol validate --config=collector_config.yaml 2>&1 & )
    if [[ $res == "" ]]; then
       echo "No errors found"
    else

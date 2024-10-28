@@ -1,6 +1,6 @@
 # OTel Collector Hands on Lab
 
-This lab teaches how to configure and setup an OpenTelemetry collector to perfrom a number of tasks. 
+This lab teaches how to configure and setup an OpenTelemetry collector to perfrom a number of tasks. It takes approximately 1 hour to do.
 
 The lab runs in a GitHub codespace, which you can do for free for a period each month. To launch the code space follow these instructions: 
 

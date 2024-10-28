@@ -7,7 +7,7 @@ This lab is made up of a number of Tasks and Challenges to help build your under
 
 An [exporter](https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/README.md) defines how data leaves the collector. In order to view the data we need to export it to a New Relic account. To configure New Relic as a destination follow the following steps to set up an OTLP exporter:
 
-> Note: You will see "nop" in the confoguration. This is a placeholder for "no operation" to ensure the configuration is valid.
+> Note: You will see "nop" in the configuration. This is a placeholder for "no operation" to ensure the configuration is valid.
 
 1. Configure environment variable for license key secret:
 

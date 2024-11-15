@@ -17,7 +17,7 @@ pmarelas288/cartservice
 pmarelas288/checkoutservice
 pmarelas288/currencyservice
 pmarelas288/emailservice
-jbuchanan122/onlineboutique-frontend
+pmarelas288/frontend
 pmarelas288/loadgenerator
 pmarelas288/paymentservice
 jbuchanan122/onlineboutique-productcatalogservice

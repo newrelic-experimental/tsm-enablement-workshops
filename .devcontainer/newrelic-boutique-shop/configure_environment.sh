@@ -31,6 +31,7 @@ newrelic/newrelic-fluentbit-output:2.0.0
 newrelic/nri-kube-events:2.9.9
 newrelic/nri-kubernetes:3.28.8
 registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0
+curlimages/curl
 )
 
    for i in "${arr[@]}"

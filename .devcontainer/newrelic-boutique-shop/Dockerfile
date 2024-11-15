@@ -21,3 +21,4 @@ COPY install_demo.sh /
 
 RUN sudo chmod +x /install_demo.sh
 
+ENV SHELL=/bin/bash

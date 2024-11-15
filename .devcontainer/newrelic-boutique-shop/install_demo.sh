@@ -103,6 +103,7 @@ deploy_demo () {
 
 
    echo -e "\nInstalling New Relic kubernetes integration\n"
+   cd /workspace
    helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=newrelic --create-namespace --values ./newrelic_values.yaml
    echo -e "\nNew Relic kubernetes deployed" 
 

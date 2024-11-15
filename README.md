@@ -7,6 +7,7 @@ A repository of codespace demos supporting TSM-led enablement.
 - [`terraform-demo`](./terraform-demo/readme.md): Terraform hands on demo (to accompany our Observability-as-Code enablement)
 - [`otel-astro-demo`](./otel-astro-demo/readme.md): OTel Astro shop sandbox
 - [`otel-collector-demo`](./otel-collector-demo/readme.md): OTel Collector lab sandbox
+- [`newrelic-boutique-shop`](./newrelic-boutique-shop/readme.md): Online Boutique Shop sandbox
 
 ## Instructions
 To run a codespace on your account:

@@ -77,6 +77,27 @@ deploy_demo () {
       break
    done
 
+   while true; do
+       BROWSER_FILE="browseragent.js"
+       
+       if [ -s "$BROWSER_FILE" ]; then
+         # The file is not-empty.
+         repl=$(<$BROWSER_FILE)
+         str="NEWRELIC_BROWSER_AGENT"
+         temp_file=$(mktemp)
+         while IFS= read -r line; do
+         echo "${line//$str/$repl}" >> "$temp_file"
+         done < ./frontend_image/header.html
+         mv "$temp_file" ./frontend_image/header.html
+         echo -e "\nBrowser agent file has been updated"
+         break
+      else
+         # The file is empty.
+         echo -e "\nPlease add New Relic browser script to browseragent.js"
+         sleep 15
+      fi
+   done
+
 
    if  [[ $licenseKey == eu* ]];  then 
       echo -e "\nLicense key is for EU datacenter"
@@ -88,17 +109,24 @@ deploy_demo () {
       datacenter="us"
    fi
 
-   # install site
-   git clone https://github.com/maralski/microservices-demo
-   cd microservices-demo
+   # Build frontend image
+   cd frontend_image
+   eval $(minikube docker-env)
+   docker build . -t onlineboutique-local-frontend:latest --no-cache          
+   cd .. 
+   echo -e "\nFrontend image built"
 
    sleep 3
 
+   # install site
+   git clone https://github.com/maralski/microservices-demo
+   cd microservices-demo/
    echo -e "\nInstalling boutique shop demo\n"
    export NEW_RELIC_LICENSE_KEY=$licenseKey; ./deploy
    echo "Demo installed"
 
-   kubectl set image deployment/frontend frontend=jbuchanan122/onlineboutique-frontend -n store
+   kubectl patch deployment frontend -n store --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/imagePullPolicy", "value": "Never"}]'
+   kubectl set image deployment/frontend frontend=onlineboutique-local-frontend:latest -n store
    kubectl set image deployment/productcatalogservice productcatalogservice=jbuchanan122/onlineboutique-productcatalogservice -n store
 
 

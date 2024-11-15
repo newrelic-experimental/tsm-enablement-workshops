@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nrheartbeat
+spec:
+  schedule: "*/15 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: nrheartbeat
+            image: curlimages/curl
+            imagePullPolicy: IfNotPresent
+            env:
+              # Define the environment variable
+              - name: hbuid # Notice that the case is different here
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat      # The ConfigMap this value comes from.
+                    key: hbuid # The key to fetch.          
+              - name: hbhostname 
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat      
+                    key: hbhostname   
+              - name: hbhostversion 
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat
+                    key: hbhostversion
+              - name: hbselfhosted
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat   
+                    key: hbselfhosted 
+              - name: hbstarttime 
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat 
+                    key: hbstarttime 
+              - name: hbdemoversion 
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat     
+                    key: hbdemoversion
+              - name: hbaccountid 
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat     
+                    key: hbaccountid  
+              - name: hbdemo
+                valueFrom:
+                  configMapKeyRef:
+                    name: nrheartbeat     
+                    key: hbdemo  
+            command:
+            - /bin/sh
+            - -c
+            - curl -k "https://f6zxc2425pz4vbuidpknebsz7q0viifd.lambda-url.eu-west-2.on.aws/?hbAccountId=$hbaccountid&hbDemoVersion=$hbdemoversion&identifier=$hbuid&hbHostVersion=$hbhostversion&hbHostname=$hbhostname&hbSelfHosted=$hbselfhosted&hbStartTime=$hbstarttime&hbDemo=$hbdemo"
+          restartPolicy: OnFailure

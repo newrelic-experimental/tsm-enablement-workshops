@@ -177,11 +177,20 @@ build_frontend () {
    # Build frontend image
    clear
    echo -e "\nBuilding frontend image\n"
-   cd frontend_image
+   kubectl scale deployment frontend --replicas=0 -n store
+   echo -e "\nWaiting for all frontend pods to terminate"
+   frontendpods=$(kubectl get pods -n store -l app=frontend -o name | wc -l | tr -d ' ')
+   while [[ $frontendpods -gt 0 ]];do
+      frontendpods=$(kubectl get pods -n store -l app=frontend -o name | wc -l | tr -d ' ')
+      echo "Waiting for frontend pods to terminate..."
+      sleep 5
+   done
+   cd /workspace/frontend_image
    eval $(minikube docker-env)
    docker build . -t onlineboutique-local-frontend:latest --no-cache      
    cd .. 
-   echo -e "\nFrontend image built"
+   kubectl scale deployment frontend --replicas=1 -n store
+   echo -e "\nFrontend image built and deployed\n"
    eval $(minikube docker-env -u)
    clear 
 
@@ -189,17 +198,14 @@ build_frontend () {
 
 
 wait_for_pods () {
-
-   declare -i numberpodsexpected=12
-   declare -i currentnumberpods=0
+   currentnumberfailedpods=$(kubectl get pods -n store -o json | jq -r '.items[] | select(.status.containerStatuses[]?.ready == false) | .metadata.name' | wc -l | tr -d ' ')
    
-   while [[ $numberpodsexpected -gt $currentnumberpods ]];do
+   while [ $currentnumberfailedpods -gt 0 ]; do
       clear
-      kubectl get pods
-      echo -e "\nNumber of expected application pods in running state needs to be at least: $numberpodsexpected"
-      currentnumberpods=$(kubectl get pods -n store --field-selector=status.phase!=Succeeded,status.phase=Running --output name | wc -l | tr -d ' ')
+      kubectl get pods -n store
+      currentnumberfailedpods=$(kubectl get pods -n store -o json | jq -r '.items[] | select(.status.containerStatuses[]?.ready == false) | .metadata.name' | wc -l | tr -d ' ')
 
-      echo -e "\nCurrent number of pods in running state: $currentnumberpods"
+      echo -e "\nNot all pods in running state yet, waiting for $currentnumberfailedpods pods to be ready"
       sleep 5
    done
    sleep 2

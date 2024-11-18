@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-DEMOVERSION="20241115"
+DEMOVERSION="20241118"
 
 main() {
    # Check if the script has been run before
@@ -9,10 +9,11 @@ main() {
        minikube start 
        echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
        sleep 3
+       build_frontend 
        wait_for_pods
        echo -e "\nChecking frontend is ready to serve\n"
-      # Double check frontend is ready to serve, or send error to terminal
-      kubectl wait pod --for=condition=Ready -l app=frontend -n store
+       # Double check frontend is ready to serve, or send error to terminal
+       kubectl wait pod --for=condition=Ready -l app=frontend -n store
 
       if [ -d "/workspace" ]; then
          kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/frontend 3000:8081 -n store >> /dev/null &
@@ -109,30 +110,23 @@ deploy_demo () {
       datacenter="us"
    fi
 
-   # Build frontend image
-   cd frontend_image
-   eval $(minikube docker-env)
-   docker build . -t onlineboutique-local-frontend:latest --no-cache          
-   cd .. 
-   echo -e "\nFrontend image built"
 
-   sleep 3
 
    # install site
    git clone https://github.com/maralski/microservices-demo
    cd microservices-demo/
    echo -e "\nInstalling boutique shop demo\n"
    export NEW_RELIC_LICENSE_KEY=$licenseKey; ./deploy
-   echo "Demo installed"
-
    kubectl patch deployment frontend -n store --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/imagePullPolicy", "value": "Never"}]'
    kubectl set image deployment/frontend frontend=onlineboutique-local-frontend:latest -n store
    kubectl set image deployment/productcatalogservice productcatalogservice=jbuchanan122/onlineboutique-productcatalogservice -n store
-
+   build_frontend 
+   kubectl delete pods --all -n store
+   echo "Demo installed"
 
    echo -e "\nInstalling New Relic kubernetes integration\n"
    cd /workspace
-   helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=newrelic --create-namespace --values ./newrelic_values.yaml
+   helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=newrelic --create-namespace --values ./newrelic_values.yaml >> /dev/null
    echo -e "\nNew Relic kubernetes deployed" 
 
    # Deploy heartbeat mechanism
@@ -152,7 +146,7 @@ deploy_demo () {
    kubectl apply -f ./hbcronjob.yaml
 
 
-   echo -e "\boutique Shop demo deployed"
+   echo -e "\nBoutique Shop demo deployed"
 
    echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
    sleep 3
@@ -161,13 +155,13 @@ deploy_demo () {
    clear
    echo -e "\nChecking frontend is ready to serve\n"
    # Double check frontend is ready to serve, or send error to terminal
-   kubectl wait pod --for=condition=Ready -l app=frontend
+   kubectl wait pod --for=condition=Ready -l app=frontend -n store
 
 
 
    if [ -d "/workspace" ]; then
       kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/frontend 3000:8081 -n store >> /dev/null &
-      gh codespace edit -c $CODESPACE_NAME -d 'newrelic-otel-astroshop'
+      gh codespace edit -c $CODESPACE_NAME -d 'nr-boutique-shop-demo'
       gh codespace ports visibility 3000:public -c $CODESPACE_NAME
       clear
       echo -e "\nAccess frontend via "https://$CODESPACE_NAME-3000.app.github.dev/""
@@ -179,9 +173,25 @@ deploy_demo () {
 
 }
 
+build_frontend () {
+
+   # Build frontend image
+   clear
+   echo -e "\nBuilding frontend image\n"
+   cd frontend_image
+   eval $(minikube docker-env)
+   docker build . -t onlineboutique-local-frontend:latest --no-cache      
+   cd .. 
+   echo -e "\nFrontend image built"
+   eval $(minikube docker-env -u)
+   clear 
+
+}
+
+
 wait_for_pods () {
 
-   declare -i numberpodsexpected=11
+   declare -i numberpodsexpected=12
    declare -i currentnumberpods=0
    
    while [[ $numberpodsexpected -gt $currentnumberpods ]];do
@@ -195,7 +205,7 @@ wait_for_pods () {
    done
    sleep 2
    clear
-   echo -e "\n All pods ready!!!"
+   echo -e "\nAll pods ready!!!"
 }
 
 main "$@"

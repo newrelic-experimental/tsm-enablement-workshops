@@ -219,7 +219,9 @@ service:
 ./collector.sh generate_log_entry
 ```
 
+
 5. Observe the logs are received in the same batch in New Relic
+
 ```
 from Log select uuid, newrelic.logs.batchIndex, message where demo='otel-collector-demo' 
 ```

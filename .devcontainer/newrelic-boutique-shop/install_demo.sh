@@ -117,11 +117,10 @@ deploy_demo () {
    cd microservices-demo/
    echo -e "\nInstalling boutique shop demo\n"
    export NEW_RELIC_LICENSE_KEY=$licenseKey; ./deploy
+   build_frontend 
    kubectl patch deployment frontend -n store --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/imagePullPolicy", "value": "Never"}]'
    kubectl set image deployment/frontend frontend=onlineboutique-local-frontend:latest -n store
    kubectl set image deployment/productcatalogservice productcatalogservice=jbuchanan122/onlineboutique-productcatalogservice -n store
-   build_frontend 
-   kubectl delete pods --all -n store
    echo "Demo installed"
 
    echo -e "\nInstalling New Relic kubernetes integration\n"

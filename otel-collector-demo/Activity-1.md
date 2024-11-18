@@ -9,6 +9,7 @@ An [exporter](https://github.com/open-telemetry/opentelemetry-collector/blob/mai
 
 > Note: You will see "nop" in the configuration. This is a placeholder for "no operation" to ensure the configuration is valid.
 
+
 1. Configure environment variable for license key secret:
 
 ```
@@ -38,7 +39,8 @@ exporters:
 
 3. Configure the services pipelines to use the New Relic exporter we just defined:
 
-All the piplines currently export to "nop". Replace these with the value `otlp/newrelic`. This will cause all the trace, metric and logs piplines to deliver data to New Relic.
+
+All the pipelines currently export to "nop". Replace these with the value `otlp/newrelic`. This will cause all the trace, metric and logs piplines to deliver data to New Relic.
 
 ```
 service:

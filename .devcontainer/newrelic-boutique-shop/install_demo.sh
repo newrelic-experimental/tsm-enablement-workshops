@@ -5,15 +5,16 @@ main() {
    # Check if the script has been run before
    if [ -f "firstrun.txt" ]; then
        echo -e "\n\nInstall script already run. Delete /firstrun.txt to re-run installation." 
-       echo -e "\n\nRestarting minikube..."
-       minikube start 
+       echo -e "\n\nRestarting minikube, this may take while please wait..."
+       minikube start
        echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
+       kubectl delete pods -n store --all > /dev/null
        sleep 3
-       build_frontend 
        wait_for_pods
        echo -e "\nChecking frontend is ready to serve\n"
        # Double check frontend is ready to serve, or send error to terminal
        kubectl wait pod --for=condition=Ready -l app=frontend -n store
+       clear
 
       if [ -d "/workspace" ]; then
          kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/frontend 3000:8081 -n store >> /dev/null &
@@ -118,10 +119,10 @@ deploy_demo () {
    echo -e "\nInstalling boutique shop demo\n"
    export NEW_RELIC_LICENSE_KEY=$licenseKey; ./deploy
    build_frontend 
-   kubectl patch deployment frontend -n store --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/imagePullPolicy", "value": "Never"}]'
-   kubectl set image deployment/frontend frontend=onlineboutique-local-frontend:latest -n store
-   kubectl set image deployment/productcatalogservice productcatalogservice=jbuchanan122/onlineboutique-productcatalogservice -n store
-   echo "Demo installed"
+   kubectl patch deployment frontend -n store --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/imagePullPolicy", "value": "Never"}]' >> /dev/null
+   kubectl set image deployment/frontend frontend=onlineboutique-local-frontend:latest -n store >> /dev/null
+   kubectl set image deployment/productcatalogservice productcatalogservice=jbuchanan122/onlineboutique-productcatalogservice -n store >> /dev/null
+   echo "Demo app installed"
 
    echo -e "\nInstalling New Relic kubernetes integration\n"
    cd /workspace
@@ -177,22 +178,22 @@ build_frontend () {
    # Build frontend image
    clear
    echo -e "\nBuilding frontend image\n"
-   kubectl scale deployment frontend --replicas=0 -n store
-   echo -e "\nWaiting for all frontend pods to terminate"
+   kubectl scale deployment frontend --replicas=0 -n store >> /dev/null
    frontendpods=$(kubectl get pods -n store -l app=frontend -o name | wc -l | tr -d ' ')
    while [[ $frontendpods -gt 0 ]];do
       frontendpods=$(kubectl get pods -n store -l app=frontend -o name | wc -l | tr -d ' ')
-      echo "Waiting for frontend pods to terminate..."
+      echo -e "\nPlease wait\n"
       sleep 5
    done
    cd /workspace/frontend_image
    eval $(minikube docker-env)
-   docker build . -t onlineboutique-local-frontend:latest --no-cache      
+   docker build . -t onlineboutique-local-frontend:latest --no-cache &> /dev/null
    cd .. 
-   kubectl scale deployment frontend --replicas=1 -n store
+   kubectl scale deployment frontend --replicas=1 -n store >> /dev/null
    echo -e "\nFrontend image built and deployed\n"
    eval $(minikube docker-env -u)
    clear 
+   
 
 }
 
@@ -205,10 +206,9 @@ wait_for_pods () {
       kubectl get pods -n store
       currentnumberfailedpods=$(kubectl get pods -n store -o json | jq -r '.items[] | select(.status.containerStatuses[]?.ready == false) | .metadata.name' | wc -l | tr -d ' ')
 
-      echo -e "\nNot all pods in running state yet, waiting for $currentnumberfailedpods pods to be ready"
-      sleep 5
+      echo -e "\nNot all pods in ready state yet, waiting for $currentnumberfailedpods pods to be ready"
+      sleep 2
    done
-   sleep 2
    clear
    echo -e "\nAll pods ready!!!"
 }

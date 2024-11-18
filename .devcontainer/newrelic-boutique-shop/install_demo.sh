@@ -206,7 +206,7 @@ wait_for_pods () {
       kubectl get pods -n store
       currentnumberfailedpods=$(kubectl get pods -n store -o json | jq -r '.items[] | select(.status.containerStatuses[]?.ready == false) | .metadata.name' | wc -l | tr -d ' ')
 
-      echo -e "\nNot all pods in ready state yet, waiting for $currentnumberfailedpods pods to be ready"
+      echo -e "\nNot all pods in ready state yet, waiting for $currentnumberfailedpods pod(s) to be ready"
       sleep 2
    done
    clear

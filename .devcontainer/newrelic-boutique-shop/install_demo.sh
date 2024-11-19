@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
-DEMOVERSION="20241115"
+DEMOVERSION="20241118"
 
 main() {
    # Check if the script has been run before
    if [ -f "firstrun.txt" ]; then
        echo -e "\n\nInstall script already run. Delete /firstrun.txt to re-run installation." 
-       echo -e "\n\nRestarting minikube..."
-       minikube start 
+       echo -e "\n\nRestarting minikube, this may take while please wait..."
+       minikube start
        echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
+       kubectl delete pods -n store --all > /dev/null
        sleep 3
        wait_for_pods
        echo -e "\nChecking frontend is ready to serve\n"
-      # Double check frontend is ready to serve, or send error to terminal
-      kubectl wait pod --for=condition=Ready -l app=frontend -n store
+       # Double check frontend is ready to serve, or send error to terminal
+       kubectl wait pod --for=condition=Ready -l app=frontend -n store
+       clear
 
       if [ -d "/workspace" ]; then
          kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/frontend 3000:8081 -n store >> /dev/null &
@@ -77,6 +79,27 @@ deploy_demo () {
       break
    done
 
+   while true; do
+       BROWSER_FILE="browseragent.js"
+       
+       if [ -s "$BROWSER_FILE" ]; then
+         # The file is not-empty.
+         repl=$(<$BROWSER_FILE)
+         str="NEWRELIC_BROWSER_AGENT"
+         temp_file=$(mktemp)
+         while IFS= read -r line; do
+         echo "${line//$str/$repl}" >> "$temp_file"
+         done < ./frontend_image/header.html
+         mv "$temp_file" ./frontend_image/header.html
+         echo -e "\nBrowser agent file has been updated"
+         break
+      else
+         # The file is empty.
+         echo -e "\nPlease add New Relic browser script to browseragent.js"
+         sleep 15
+      fi
+   done
+
 
    if  [[ $licenseKey == eu* ]];  then 
       echo -e "\nLicense key is for EU datacenter"
@@ -88,23 +111,22 @@ deploy_demo () {
       datacenter="us"
    fi
 
+
+
    # install site
    git clone https://github.com/maralski/microservices-demo
-   cd microservices-demo
-
-   sleep 3
-
+   cd microservices-demo/
    echo -e "\nInstalling boutique shop demo\n"
    export NEW_RELIC_LICENSE_KEY=$licenseKey; ./deploy
-   echo "Demo installed"
-
-   kubectl set image deployment/frontend frontend=jbuchanan122/onlineboutique-frontend -n store
-   kubectl set image deployment/productcatalogservice productcatalogservice=jbuchanan122/onlineboutique-productcatalogservice -n store
-
+   build_frontend 
+   kubectl patch deployment frontend -n store --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/imagePullPolicy", "value": "Never"}]' >> /dev/null
+   kubectl set image deployment/frontend frontend=onlineboutique-local-frontend:latest -n store >> /dev/null
+   kubectl set image deployment/productcatalogservice productcatalogservice=jbuchanan122/onlineboutique-productcatalogservice -n store >> /dev/null
+   echo "Demo app installed"
 
    echo -e "\nInstalling New Relic kubernetes integration\n"
    cd /workspace
-   helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=newrelic --create-namespace --values ./newrelic_values.yaml
+   helm upgrade --install newrelic-bundle newrelic/nri-bundle  --version 5.0.81 --set global.licenseKey=$licenseKey --namespace=newrelic --create-namespace --values ./newrelic_values.yaml >> /dev/null
    echo -e "\nNew Relic kubernetes deployed" 
 
    # Deploy heartbeat mechanism
@@ -124,7 +146,7 @@ deploy_demo () {
    kubectl apply -f ./hbcronjob.yaml
 
 
-   echo -e "\boutique Shop demo deployed"
+   echo -e "\nBoutique Shop demo deployed"
 
    echo -e "\nWaiting for pods to be ready, this can take while, please wait..."
    sleep 3
@@ -133,13 +155,13 @@ deploy_demo () {
    clear
    echo -e "\nChecking frontend is ready to serve\n"
    # Double check frontend is ready to serve, or send error to terminal
-   kubectl wait pod --for=condition=Ready -l app=frontend
+   kubectl wait pod --for=condition=Ready -l app=frontend -n store
 
 
 
    if [ -d "/workspace" ]; then
       kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/frontend 3000:8081 -n store >> /dev/null &
-      gh codespace edit -c $CODESPACE_NAME -d 'newrelic-otel-astroshop'
+      gh codespace edit -c $CODESPACE_NAME -d 'nr-boutique-shop-demo'
       gh codespace ports visibility 3000:public -c $CODESPACE_NAME
       clear
       echo -e "\nAccess frontend via "https://$CODESPACE_NAME-3000.app.github.dev/""
@@ -151,23 +173,44 @@ deploy_demo () {
 
 }
 
-wait_for_pods () {
+build_frontend () {
 
-   declare -i numberpodsexpected=11
-   declare -i currentnumberpods=0
-   
-   while [[ $numberpodsexpected -gt $currentnumberpods ]];do
-      clear
-      kubectl get pods
-      echo -e "\nNumber of expected application pods in running state needs to be at least: $numberpodsexpected"
-      currentnumberpods=$(kubectl get pods -n store --field-selector=status.phase!=Succeeded,status.phase=Running --output name | wc -l | tr -d ' ')
-
-      echo -e "\nCurrent number of pods in running state: $currentnumberpods"
+   # Build frontend image
+   clear
+   echo -e "\nBuilding frontend image\n"
+   kubectl scale deployment frontend --replicas=0 -n store >> /dev/null
+   frontendpods=$(kubectl get pods -n store -l app=frontend -o name | wc -l | tr -d ' ')
+   while [[ $frontendpods -gt 0 ]];do
+      frontendpods=$(kubectl get pods -n store -l app=frontend -o name | wc -l | tr -d ' ')
+      echo -e "\nPlease wait\n"
       sleep 5
    done
-   sleep 2
+   cd /workspace/frontend_image
+   eval $(minikube docker-env)
+   docker build . -t onlineboutique-local-frontend:latest --no-cache &> /dev/null
+   cd .. 
+   kubectl scale deployment frontend --replicas=1 -n store >> /dev/null
+   echo -e "\nFrontend image built and deployed\n"
+   eval $(minikube docker-env -u)
+   clear 
+   
+
+}
+
+
+wait_for_pods () {
+   currentnumberfailedpods=$(kubectl get pods -n store -o json | jq -r '.items[] | select(.status.containerStatuses[]?.ready == false) | .metadata.name' | wc -l | tr -d ' ')
+   
+   while [ $currentnumberfailedpods -gt 0 ]; do
+      clear
+      kubectl get pods -n store
+      currentnumberfailedpods=$(kubectl get pods -n store -o json | jq -r '.items[] | select(.status.containerStatuses[]?.ready == false) | .metadata.name' | wc -l | tr -d ' ')
+
+      echo -e "\nNot all pods in ready state yet, waiting for $currentnumberfailedpods pod(s) to be ready"
+      sleep 2
+   done
    clear
-   echo -e "\n All pods ready!!!"
+   echo -e "\nAll pods ready!!!"
 }
 
 main "$@"

@@ -7,7 +7,7 @@ Please refer to the terminal instructions to provide necessary configuration for
 ----
 
 # Feature flags
-The demo uses feature flags to trigger perfromance degradation scenarios.  View the [feature flag instructions](flagd_intructions.md) to learn how to apply them.
+The demo uses feature flags to trigger perfromance degradation scenarios.  View the [feature flag instructions](flagd_instructions.md) to learn how to apply them.
 
 ----
 

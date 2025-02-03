@@ -50,10 +50,9 @@ registry.k8s.io/kube-scheduler:v1.32.0
 registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0
 registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.11.0
 valkey/valkey:7.2-alpine
-newrelic/k8s-events-forwarder:1.60.1
-newrelic/k8s-metadata-injection:1.27.3
-redis:7.2-alpine
 newrelic/infrastructure-bundle:3.2.63
+newrelic/k8s-events-forwarder:1.59.2
+newrelic/k8s-events-forwarder:1.60.1
 newrelic/k8s-metadata-injection:1.31.1
 newrelic/newrelic-fluentbit-output:2.1.0
 newrelic/nr-otel-collector:0.8.10

@@ -79,7 +79,14 @@ vi browseragent.js
 //     then press [ENTER KEY] 
 ```
 
+Update group membership for current session
+
+```
+newgrp docker
+```
+
 Then run the installer. You will need your ingest license key:
+
 ```
 ./install_selfhosted.sh
 ```

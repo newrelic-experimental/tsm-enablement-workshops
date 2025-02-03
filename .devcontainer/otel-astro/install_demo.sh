@@ -135,9 +135,9 @@ deploy_demo () {
    
    # Intentionally deploying the otel demo with another otel collector with specific configuration for the demo TODO: Refactor this to use the same collector deployed NRDOT
    if [[  $(echo $datacenter | tr '[:upper:]' '[:lower:]') ==  "eu" ]]; then
-      helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./otel_values.yaml --version 0.31.0 --set opentelemetry-collector.config.exporters.otlp.endpoint="otlp.eu01.nr-data.net:4318" >> /dev/null
+      helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./otel_values.yaml --version 0.33.8 --set opentelemetry-collector.config.exporters.otlp.endpoint="otlp.eu01.nr-data.net:4318" >> /dev/null
    else
-      helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./otel_values.yaml --version 0.31.0 >> /dev/null
+      helm upgrade --install newrelic-otel open-telemetry/opentelemetry-demo --values ./otel_values.yaml --version 0.33.8 >> /dev/null
    fi
 
 

@@ -85,7 +85,7 @@ components:
         value: delta
     resources:
       limits:
-        memory: 20Mi
+        memory: 120Mi
     initContainers:
       - name: wait-for-kafka
         image: busybox:latest
@@ -123,8 +123,8 @@ components:
         value: "8080"
       - name: ASPNETCORE_URLS
         value: http://*:$(CART_SERVICE_PORT)
-      - name: REDIS_ADDR
-        value: '{{ include "otel-demo.name" . }}-redis:6379'
+      - name: VALKEY_ADDR
+        value: '{{ include "otel-demo.name" . }}-valkey:6379'
       - name: FLAGD_HOST
         value: '{{ include "otel-demo.name" . }}-flagd'
       - name: FLAGD_PORT
@@ -135,9 +135,9 @@ components:
       limits:
         memory: 160Mi
     initContainers:
-      - name: wait-for-redis
+      - name: wait-for-valkey
         image: busybox:latest
-        command: ['sh', '-c', 'until nc -z -v -w30 {{ include "otel-demo.name" . }}-redis 6379; do echo waiting for redis; sleep 2; done;']
+        command: ['sh', '-c', 'until nc -z -v -w30 {{ include "otel-demo.name" . }}-valkey 6379; do echo waiting for valkey; sleep 2; done;']
 
   checkoutService:
     enabled: true
@@ -148,10 +148,6 @@ components:
     env:
       - name: CHECKOUT_SERVICE_PORT
         value: "8080"
-      - name: FLAGD_HOST
-        value: '{{ include "otel-demo.name" . }}-flagd'
-      - name: FLAGD_PORT
-        value: "8013"
       - name: CART_SERVICE_ADDR
         value: '{{ include "otel-demo.name" . }}-cartservice:8080'
       - name: CURRENCY_SERVICE_ADDR
@@ -166,6 +162,10 @@ components:
         value: '{{ include "otel-demo.name" . }}-shippingservice:8080'
       - name: KAFKA_SERVICE_ADDR
         value: '{{ include "otel-demo.name" . }}-kafka:9092'
+      - name: FLAGD_HOST
+        value: '{{ include "otel-demo.name" . }}-flagd'
+      - name: FLAGD_PORT
+        value: "8013"
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
         value: http://$(OTEL_COLLECTOR_NAME):4317
     resources:
@@ -175,7 +175,6 @@ components:
       - name: wait-for-kafka
         image: busybox:latest
         command: ['sh', '-c', 'until nc -z -v -w30 {{ include "otel-demo.name" . }}-kafka 9092; do echo waiting for kafka; sleep 2; done;']
-
   currencyService:
     enabled: true
     useDefault:
@@ -209,18 +208,17 @@ components:
     resources:
       limits:
         memory: 100Mi
-
   frauddetectionService:
     enabled: true
     useDefault:
       env: true
     env:
+      - name: KAFKA_SERVICE_ADDR
+        value: '{{ include "otel-demo.name" . }}-kafka:9092'
       - name: FLAGD_HOST
         value: '{{ include "otel-demo.name" . }}-flagd'
       - name: FLAGD_PORT
         value: "8013"
-      - name: KAFKA_SERVICE_ADDR
-        value: '{{ include "otel-demo.name" . }}-kafka:9092'
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
         value: http://$(OTEL_COLLECTOR_NAME):4318
     resources:
@@ -230,7 +228,6 @@ components:
       - name: wait-for-kafka
         image: busybox:latest
         command: ['sh', '-c', 'until nc -z -v -w30 {{ include "otel-demo.name" . }}-kafka 9092; do echo waiting for kafka; sleep 2; done;']
-
   frontend:
     enabled: true
     imageOverride:
@@ -259,6 +256,10 @@ components:
         value: '{{ include "otel-demo.name" . }}-recommendationservice:8080'
       - name: SHIPPING_SERVICE_ADDR
         value: '{{ include "otel-demo.name" . }}-shippingservice:8080'
+      - name: FLAGD_HOST
+        value: '{{ include "otel-demo.name" . }}-flagd'
+      - name: FLAGD_PORT
+        value: "8013"
       - name: OTEL_COLLECTOR_HOST
         value: $(OTEL_COLLECTOR_NAME)
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
@@ -267,10 +268,6 @@ components:
         value: frontend-web
       - name: PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
         value: http://localhost:8080/otlp-http/v1/traces             # This expects users to use `kubectl port-forward ...`
-      - name: FLAGD_HOST
-        value: '{{ include "otel-demo.name" . }}-flagd'
-      - name: FLAGD_PORT
-        value: "8013"
     resources:
       limits:
         memory: 250Mi
@@ -297,6 +294,10 @@ components:
         value: '{{ include "otel-demo.name" . }}-flagd'
       - name: FLAGD_PORT
         value: "8013"
+      - name: FLAGD_UI_HOST
+        value: '{{ include "otel-demo.name" . }}-flagd'
+      - name: FLAGD_UI_PORT
+        value: "4000"
       - name: FRONTEND_HOST
         value: '{{ include "otel-demo.name" . }}-frontend'
       - name: FRONTEND_PORT
@@ -371,15 +372,15 @@ components:
         value: "true"
       - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
         value: python
-      - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: http://$(OTEL_COLLECTOR_NAME):4317
       - name: FLAGD_HOST
         value: '{{ include "otel-demo.name" . }}-flagd'
       - name: FLAGD_PORT
         value: "8013"
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://$(OTEL_COLLECTOR_NAME):4317
     resources:
       limits:
-        memory: 1Gi
+        memory: 1500Mi
 
   paymentService:
     enabled: true
@@ -449,6 +450,11 @@ components:
       repository: newrelic/otel-demo
       tag: "1.11.0-recommendationservice"
       pullPolicy: Always
+    enabled: true
+    useDefault:
+      env: true
+    service:
+      port: 8080
     env:
       - name: RECOMMENDATION_SERVICE_PORT
         value: "8080"
@@ -496,7 +502,7 @@ components:
     enabled: true
     imageOverride:
       repository: "ghcr.io/open-feature/flagd"
-      tag: "v0.10.1"
+      tag: "v0.11.1"
     useDefault:
       env: true
     replicas: 1
@@ -509,16 +515,46 @@ components:
         value: $(OTEL_COLLECTOR_NAME):4317
     resources:
       limits:
-        memory: 50Mi
+        memory: 75Mi
     command:
       - "/flagd-build"
       - "start"
       - "--uri"
       - "file:./etc/flagd/demo.flagd.json"
-    mountedConfigMaps:
-      - name: config
+    mountedEmptyDirs:
+      - name: config-rw
         mountPath: /etc/flagd
-        existingConfigMap: '{{ include "otel-demo.name" . }}-flagd-config'
+    # flgad-ui as a sidecar container in the same pod so the flag json file can be shared
+    sidecarContainers:
+      - name: flagdui
+        useDefault:
+          env: true
+        service:
+          port: 4000
+        env:
+          - name: FLAGD_METRICS_EXPORTER
+            value: otel
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: http://$(OTEL_COLLECTOR_NAME):4318
+        resources:
+          limits:
+            memory: 75Mi
+        volumeMounts:
+          - name: config-rw
+            mountPath: /app/data
+    initContainers:
+      - name: init-config
+        image: busybox
+        command: ['sh', '-c', 'cp /config-ro/demo.flagd.json /config-rw/demo.flagd.json && cat /config-rw/demo.flagd.json']
+        volumeMounts:
+          - mountPath: /config-ro
+            name: config-ro
+          - mountPath: /config-rw
+            name: config-rw
+    additionalVolumes:
+      - name: config-ro
+        configMap:
+          name: '{{ include "otel-demo.name" . }}-flagd-config'
 
   kafka:
     enabled: true
@@ -545,22 +581,22 @@ components:
       runAsGroup: 1000
       runAsNonRoot: true
 
-  redis:
+  valkey:
     enabled: true
     useDefault:
       env: true
     imageOverride:
-      repository: "redis"
+      repository: "valkey/valkey"
       tag: "7.2-alpine"
     replicas: 1
     ports:
-      - name: redis
+      - name: valkey
         value: 6379
     resources:
       limits:
         memory: 20Mi
     securityContext:
-      runAsUser: 999  # redis
+      runAsUser: 999  # valkey
       runAsGroup: 1000
       runAsNonRoot: true
 
@@ -620,7 +656,7 @@ opentelemetry-collector:
         targets:
           - endpoint: 'http://{{ include "otel-demo.name" . }}-frontendproxy:8080'
       redis:
-        endpoint: "newrelic-otel-redis:6379"
+        endpoint: "valkey-cart:6379"
         collection_interval: 10s
         
       prometheus:

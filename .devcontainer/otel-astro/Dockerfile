@@ -34,3 +34,6 @@ COPY install_demo.sh /
 
 RUN sudo chmod +x /install_demo.sh
 
+SHELL [ "/bin/bash", "-c" ]
+
+ENV SHELL=/bin/bash

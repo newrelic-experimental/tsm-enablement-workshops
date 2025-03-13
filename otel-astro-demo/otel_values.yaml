@@ -847,7 +847,10 @@ opentelemetry-collector:
       #         - container_memory_.*
       #         - kube_.*
       #         - system.*
-      memory_limiter: null
+      memory_limiter:
+        limit_percentage: 80
+        spike_limit_percentage: 25
+        check_interval: 5s        
       
     connectors:
       spanmetrics: {}

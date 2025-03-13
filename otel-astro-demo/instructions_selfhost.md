@@ -1,5 +1,5 @@
 # Self Host
-Use these instructions to run the demo in your own environment rather than in a codesapce. This allows you to run for longer amongst other benefits. The demo requires Docker, minikube, kubectl and helm and the guidance is based on an Ubuntu  AWS EC2 t2.xlarge instance (or Azure Standard D4s 4CPU VM). You may need to adjust the installation of the dependencies if using a different operating system.
+Use these instructions to run the demo in your own environment rather than in a codesapce. This allows you to run for longer amongst other benefits. The demo requires Docker, minikube, kubectl and helm and the guidance is based on an Ubuntu  AWS EC2 t2.xlarge instance (or Azure Standard D4s 4CPU VM) with at least 32GB disk size. You may need to adjust the installation of the dependencies if using a different operating system.
 
 ## Environment Setup (Ubuntu 24.x LTS)
 
@@ -91,6 +91,15 @@ Then run the installer. You will need your ingest license key:
 ./install_selfhosted.sh
 ```
 
+To access the frontend
+
+Ensure that your security group inbound rule allows TCP on port 8080, then run below command 
+
+```
+kubectl --address 0.0.0.0 port-forward --pod-running-timeout=24h svc/newrelic-otel-frontendproxy 8080:8080 >> /dev/null &
+```
+
+> Access the frontend using http://YOUR_EC2_PUBLIC_ADDRESS:8080
 
 # Feature flags
 The demo uses feature flags to trigger perfromance degradation scenarios.  View the [feature flag instructions](flagd_intructions.md) to learn how to apply them.

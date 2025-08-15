@@ -1,0 +1,42 @@
+{
+  "name": "New Relic Custom Visualization Workshop",
+  "forwardPorts": [3000, 8080],
+  "portsAttributes": {
+    "3000": {
+      "label": "New Relic Development Server",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "Alternative Dev Server",
+      "onAutoForward": "notify"
+    }
+  },
+    "customizations": {
+    "vscode": {
+    "extensions": [
+      "bierner.markdown-preview-enhanced"
+    ],
+    "settings": {
+      "markdown-preview-enhanced.mermaidTheme": "default",
+      "markdown-preview-enhanced.previewTheme": "default"
+    }
+  },
+    "codespaces": {
+      "openFiles": [
+        "Instructions.md"
+      ]
+    }
+  },
+  // "hostRequirements": {"cpus": 3,"memory": "6gb"},
+  "containerUser": "demouser",
+  // "remoteUser": "root",
+  "postCreateCommand": "bash setup.sh",
+  // "postAttachCommand": "/bin/bash -l -c 'echo \"PATH is: $PATH\"; which code; whoami; code README.md'",
+  "build": { "dockerfile": "Dockerfile" },
+  "workspaceMount": "source=${localWorkspaceFolder}/customviz,target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/guiyomh/features/vim:0": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
+}

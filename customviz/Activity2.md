@@ -12,9 +12,7 @@
 nr1 create --type nerdpack --name my-nerdpack -Q
 cd /workspace/my-nerdpack
 nr1 create --type visualization --name my-custom-visualization
-cd ..
 ```
-Accept the suggested Nerdpack name when prompted.
 
 ### 2. Explore the Generated Files
 ```bash

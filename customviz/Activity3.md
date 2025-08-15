@@ -9,7 +9,7 @@
 ### 1. Local Development
 ```bash
 cd /workspace/my-nerdpack
-npm install
+npm install --legacy-peer-deps
 nr1 nerdpack:serve
 ```
 Open the provided link to view your live visualization. Any code changes will be reflected instantly.

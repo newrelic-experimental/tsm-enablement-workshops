@@ -11,11 +11,11 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash - 
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | sudo bash - 
 
 RUN apt-get install -y nodejs
 
-RUN  curl -s https://cli.nr-ext.net/installer.sh | sudo bash
+RUN curl -s https://cli.nr-ext.net/installer.sh | sudo bash
 
 RUN export PATH="/usr/local/bin:$PATH" && echo 'export PATH="/usr/local/bin:$PATH"' >> /root/.bashrc
 

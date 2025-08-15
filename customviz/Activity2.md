@@ -13,6 +13,11 @@ nr1 create --type nerdpack --name my-nerdpack -Q
 cd /workspace/my-nerdpack
 nr1 create --type visualization --name my-custom-visualization
 ```
+### 1a. Downgrage Recharts ( only required on lab environment)
+```bash
+cd /workspace/my-nerdpack
+npm install recharts@2.6.2
+```
 
 ### 2. Explore the Generated Files
 ```bash

@@ -9,6 +9,7 @@
 
 ### 1. Build and Publish
 ```bash
+cd /workspace/my-nerdpack
 nr1 nerdpack:build
 nr1 nerdpack:publish
 nr1 nerdpack:subscribe

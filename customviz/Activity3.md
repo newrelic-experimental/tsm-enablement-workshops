@@ -8,7 +8,7 @@
 
 ### 1. Local Development
 ```bash
-cd ~/workshop/<your-nerdpack>
+cd /workspace/my-nerdpack
 npm install
 nr1 nerdpack:serve
 ```

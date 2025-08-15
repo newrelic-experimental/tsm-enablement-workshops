@@ -9,18 +9,19 @@
 
 ### 1. Create a Nerdpack and Visualization
 ```bash
-cd ~/workshop
-nr1 create --type visualization --name my-awesome-visualization
+nr1 create --type nerdpack --name my-nerdpack -Q
+cd /workspace/my-nerdpack
+nr1 create --type visualization --name my-custom-visualization
+cd ..
 ```
 Accept the suggested Nerdpack name when prompted.
 
 ### 2. Explore the Generated Files
 ```bash
-ls -la
-cd */
-ls -la visualizations/my-awesome-visualization/
-cat visualizations/my-awesome-visualization/nr1.json
-head -25 visualizations/my-awesome-visualization/index.js
+cd /workspace/my-nerdpack
+ls -la visualizations/my-custom-visualization/
+cat visualizations/my-custom-visualization/nr1.json
+head -25 visualizations/my-custom-visualization/index.js
 ```
 Key files:
 - `nr1.json`: Visualization configuration

@@ -8,6 +8,7 @@ A repository of codespace demos supporting TSM-led enablement.
 - [`otel-astro-demo`](./otel-astro-demo/readme.md): OTel Astro shop sandbox
 - [`otel-collector-demo`](./otel-collector-demo/readme.md): OTel Collector lab sandbox
 - [`newrelic-boutique-shop`](./newrelic-boutique-shop/readme.md): Online Boutique Shop sandbox
+- [`newrelic-custom-viz`](./customviz/readme.md): New Relic Custom Visualization Workshop
 
 ## Instructions
 To run a codespace on your account:
